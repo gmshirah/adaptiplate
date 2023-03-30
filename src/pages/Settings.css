@@ -1,0 +1,13 @@
+div.container {
+    text-align: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+h1 {
+    padding-bottom: 1rem;
+}
+
+#titleText {
+    color: #33DB80;
+}
