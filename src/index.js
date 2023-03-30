@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import Recipe from './pages/Recipe';
 import Saved from './pages/Saved';
@@ -28,6 +29,7 @@ root.render(
           element={<Navigate to="/" replace />}
         />
       </Routes>
+      <NavBar />
     </BrowserRouter>
   </>
 );
