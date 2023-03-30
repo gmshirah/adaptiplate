@@ -26,9 +26,12 @@ function Home() {
         <InputGroup>
           <Form.Control type="text" />
           <Button variant="outline-secondary" id="searchBtn" type="submit">
-            <span className="material-symbols-outlined">
+            {/* <span className="material-symbols-outlined">
               search
-            </span>
+            </span> */}
+            <Link to="/recipe" id="searchLink" className="material-symbols-outlined">
+              search
+            </Link>
           </Button>
         </InputGroup>
       </Form>
