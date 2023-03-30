@@ -11,3 +11,8 @@ h1 {
 #titleText {
     color: #33DB80;
 }
+
+.account-image {
+    height: 200px;
+    width: 200px;
+}
