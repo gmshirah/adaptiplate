@@ -1,0 +1,159 @@
+.food-image {
+    background-image: "https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg";
+    object-fit: cover;
+    display: block;
+    width: 100%;
+    height: 480px;
+}
+
+.recipe-name {
+    background-color: rgba(0, 0, 0, 0.596);
+    text-align: center;
+    position:absolute;
+    top: 0;
+    left: 0;
+    font-size:250%;
+    font-weight: 700;
+    border-radius: 10px; 
+    margin: 2%;
+    padding: 1%;
+}
+
+.recipe-price {
+    background-color: rgba(0, 0, 0, 0.596);
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: xx-large;
+    border-radius: 10px; 
+    line-height: 120%;
+}
+
+.recipe-time {
+    background-color: rgba(0, 0, 0, 0.596);
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    font-size: xx-large;
+    border-radius: 10px; 
+    line-height: 120%;
+
+}
+
+.recipe-health {
+    background-color: rgba(0, 0, 0, 0.596);
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    font-size: xx-large;
+    border-radius: 10px; 
+    line-height: 120%;
+
+}
+
+.accordion-toggle {
+    font-size: 150%;
+    font-weight: 700;
+    background-color: #33DB80;
+
+}
+
+.ingredient-card {
+    background-color: #33DB80;
+    border-radius: 50px;
+    margin-bottom: 2%;
+}
+
+.ingredient-amount {
+    background-color: rgb(220, 220, 220);
+    border-color: black;
+    border-radius: 30px; 
+    border-width: 1px;
+    border-style: solid;   
+    min-width: fit-content;
+    max-height: fit-content;
+    padding-top: 3%;
+    font-size: large;
+    display: flex;
+    align-items: flex-start;
+}
+
+.back-button {
+    background-color: white;
+    border-color: black;
+    border-radius: 2px;
+    border-style: solid;
+    border-radius: 70px;
+    margin-bottom: 4%;
+    display:block;
+    padding: 1%;
+    max-width: fit-content;
+    max-height: fit-content;
+    line-height: 80%;
+    margin-left: 4%;
+    
+}
+
+.ingredient-name {
+    font-size: x-large;
+    min-width: fit-content;
+}
+
+.save-button {
+    background-color: white;
+    border-color: black;
+    border-radius: 2px;
+    border-style: solid;
+    border-radius: 70px;
+    margin-bottom: 4%;
+    display:block;
+    padding: 1%;
+    max-width: fit-content;
+    max-height: fit-content;
+    line-height: 80%;
+    margin-left: auto;
+    margin-right: 4%;
+
+
+}
+
+.info-button {
+    max-width: fit-content;
+    min-width: 50px;
+    max-height: fit-content;
+    min-height: 50px;
+    border-radius: 30px;
+    border-color: black;
+    border-width: 1px;
+    border-style: solid;
+    margin: .5%;
+    display:block;    
+    margin-left: auto;
+    font-weight: 600;
+    font-size: large;
+}
+
+.sub {
+    background-color: rgb(220, 220, 220);
+    border-color: black;
+    border-radius: 30px;
+    border-width: 1px;
+    border-style: solid;
+    line-height: 200%;
+    margin-bottom: .5%;
+    padding-left: 2%;
+    font-size: large;
+}
+
+.dollars {
+    color: rgb(0, 224, 0);
+}
+
+.minutes {
+    color: rgb(0, 224, 0);
+}
+
+.leaves {
+    color: rgb(0, 224, 0);
+}
