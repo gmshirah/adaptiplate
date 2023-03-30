@@ -25,7 +25,7 @@ const recipes = [
     time: '15 min',
   },
   {
-    id: 2,
+    id: 3,
     name: 'Chicken Alfredo',
     img: 'https://hips.hearstapps.com/hmg-prod/images/delish-221130-perfect-chicken-alfredo-0683-eb-1670449995.jpg?crop=1xw:0.8277591973244147xh;center,top',
     cost: '$12',
@@ -33,7 +33,6 @@ const recipes = [
     time: '40 min',
   },
 ];
-
 
 const RecipeCard = ({ recipe, path }) => {
   const handleClick = (event) => {
@@ -57,8 +56,6 @@ const RecipeCard = ({ recipe, path }) => {
     </Col>
   );
 };
-
-
 
 function Saved() {
   return (
