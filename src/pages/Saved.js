@@ -1,6 +1,11 @@
 import './Saved.css';
 import { Link } from 'react-router-dom';
-import { Container, Row, Col, Card } from 'react-bootstrap';
+import {
+  Container,
+  Row,
+  Col,
+  Card
+} from 'react-bootstrap';
 
 const recipes = [
   {
@@ -37,13 +42,11 @@ const RecipeCard = ({ recipe, path }) => {
   return (
     <Col md={6}>
       <Link to="/recipe" onClick={handleClick}>
-        <Card className="mb-4 border-0" style={{ minWidth: '300px' }}>
-          <Card.Img variant="top" src={recipe.img} className='card-image' />
-          <Card.ImgOverlay className="card-overlay">
-            <div className="recipe-info">
-              <h4 style={{ fontSize: '24px' }}>{recipe.name}</h4>
-            </div>
-            <div className="recipe-stats">
+        <Card>
+          <Card.Img variant="top" src={recipe.img} />
+          <Card.ImgOverlay>
+            <h4 id="recipeTitle">{recipe.name}</h4>
+            <div id="recipeStats">
               <Card.Text>{recipe.cost}</Card.Text>
               <Card.Text>{recipe.health}</Card.Text>
               <Card.Text>{recipe.time}</Card.Text>
@@ -59,27 +62,16 @@ const RecipeCard = ({ recipe, path }) => {
 
 function Saved() {
   return (
-    <div>
-      <h3>Temporary Page Navigation</h3>
-      <Link to="/">Home Page</Link>
-      <br />
-      <Link to="/recipe">Recipe Page</Link>
-      <br />
-      <Link to="/settings">Settings Page</Link>
-
-      <h1 className='heading'>Favorites</h1>
-
-      <Container>
-        <div className="scrollable-content">
-          <Row>
-            {recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
-            ))}
-          </Row>
-        </div>
-
-      </Container>
-    </div>
+    <Container>
+      <h1 id="titleText">Saved Recipes</h1>
+      <div id="scrollableContent">
+        <Row>
+          {recipes.map((recipe) => (
+            <RecipeCard key={recipe.id} recipe={recipe} />
+          ))}
+        </Row>
+      </div>
+    </Container>
   );
 }
 
