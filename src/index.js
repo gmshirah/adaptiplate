@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Home from './pages/Home';
 import Recipe from './pages/Recipe';
@@ -18,7 +18,7 @@ root.render(
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
     />
-    <BrowserRouter>
+    <HashRouter basename='/'>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/recipe" element={<Recipe />} />
@@ -30,7 +30,7 @@ root.render(
         />
       </Routes>
       <NavBar />
-    </BrowserRouter>
+    </HashRouter>
   </>
 );
 
