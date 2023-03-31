@@ -10,12 +10,7 @@ import {
   Row,
   Col,
   Image,
-  Card
 } from 'react-bootstrap';
-import backButton from "../assets/back-arrow.png";
-import chickenPic from "../assets/orangechicken.png";
-import savedButton from "../assets/save-star.png";
-import savedYellowButton from "../assets/save-star-yellow.png"
 
 const Ingredient = ({ ingredient }) => {
   return (
