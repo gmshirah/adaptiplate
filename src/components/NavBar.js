@@ -1,5 +1,5 @@
 import './NavBar.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import {
   Container,
   Navbar
@@ -10,17 +10,17 @@ function NavBar() {
     <div>
       <Navbar fixed="bottom">
         <Container id="navbarContainer">
-          <Link to="/" id="navbarLink">
+          <Link to="/" id={ (useLocation().pathname === "/") ? "navbarLinkSelected" : "navbarLink" }>
             <span className="material-symbols-outlined" id="navbarIcon">
               search
             </span>
           </Link>
-          <Link to="/saved" id="navbarLink">
+          <Link to="/saved" id={ (useLocation().pathname === "/saved") ? "navbarLinkSelected" : "navbarLink" }>
             <span className="material-symbols-outlined" id="navbarIcon">
               bookmark
             </span>
           </Link>
-          <Link to="/settings" id="navbarLink">
+          <Link to="/settings" id={ (useLocation().pathname === "/settings") ? "navbarLinkSelected" : "navbarLink" }>
             <span className="material-symbols-outlined" id="navbarIcon">
               account_circle
             </span>
