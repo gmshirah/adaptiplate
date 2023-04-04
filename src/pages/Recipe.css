@@ -45,8 +45,28 @@ h1, h3 {
     width: 100px;
 }
 
+.accordion {
+    --bs-accordion-border-width: 2px;
+    /* --bs-accordion-btn-icon: url('../assets/expand_more_FILL0_wght400_GRAD0_opsz48.svg');
+    --bs-accordion-btn-active-icon: url('../assets/expand_more_FILL0_wght400_GRAD0_opsz48.svg'); */
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: rgb(240, 240, 240);
+}
+
+.accordion-button:focus {
+    border-color:rgb(100, 100, 100);
+    box-shadow: none;
+}
+
+#ingredientName, #ingredientAmount {
+    color: black;
+}
+
 #ingredientName {
-    font-size: 24px;
+    font-weight: 500;
+    font-size: 22px;
 }
 
 #ingredientAmount {

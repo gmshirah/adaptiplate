@@ -179,7 +179,7 @@ function Recipe() {
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
-            eco
+            favorite
           </div>
           <p id="statText">{recipe.health}</p>
         </div>
