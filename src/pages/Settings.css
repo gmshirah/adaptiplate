@@ -12,7 +12,34 @@ h1 {
     color: #29CC7A;
 }
 
-.account-image {
-    height: 200px;
-    width: 200px;
+#accountImage {
+    max-height: 200px;
+    max-width: 200px;
+    margin-bottom: 2rem;
+}
+
+#settings {
+    text-align: start;
+    padding-bottom: 4rem;
+}
+
+#setting, #deleteAccount {
+    display: flex;
+    justify-content: space-between;
+}
+
+#deleteAccount {
+    color: red;
+}
+
+#settingText {
+    width: auto;
+    display: flex;
+}
+
+#selectIcon {
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
