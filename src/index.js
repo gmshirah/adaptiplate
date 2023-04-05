@@ -7,9 +7,9 @@ import Home from './pages/Home';
 import Recipe from './pages/Recipe';
 import Saved from './pages/Saved';
 import Settings from './pages/Settings';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import reportWebVitals from './reportWebVitals';
-
-<Route exact path="/home" component={Home} />
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -24,6 +24,8 @@ root.render(
         <Route path="/recipe" element={<Recipe />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route
           path="*"
           element={<Navigate to="/" replace />}
