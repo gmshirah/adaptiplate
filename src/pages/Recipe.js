@@ -14,7 +14,7 @@ import {
 
 const Ingredient = ({ ingredient }) => {
   return (
-    <Accordion.Item eventKey={ingredient.key}>
+    <Accordion.Item eventKey={ingredient.id}>
       <Accordion.Header>
         <span id="ingredientName">{ingredient.name}</span>
         <span id="ingredientAmount">{ingredient.amount}</span>
