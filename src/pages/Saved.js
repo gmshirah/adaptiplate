@@ -96,7 +96,7 @@ function Saved ()
       {loggedIn ? (
         <div>
           <h1 id="titleText">Saved Recipes</h1>
-          <div id="scrollableContent">
+          <div>
             <Row>
               {savedRecipes.map( ( recipe ) => (
                 <RecipeCard recipe={recipe} />

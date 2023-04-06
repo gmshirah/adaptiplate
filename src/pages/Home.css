@@ -1,12 +1,12 @@
 div.container {
     text-align: center;
     padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-bottom: 6rem;
 }
 
 #titleText {
     color: #29CC7A;
-    padding-bottom: 1rem;
+    padding-bottom: 0rem;
 }
 
 #searchBtn {
@@ -22,20 +22,17 @@ div.container {
 }
 
 #headingText {
-    padding-top: 0rem;
-    padding-bottom: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 0rem;
 }
 
 form {
     padding-bottom: 2rem;
 }
 
-#scrollableContent {
-    padding-bottom: 4rem;
-}
-
-.card {
-    margin-bottom: 2rem;
+#recipeCard {
+    margin-top: 2rem;
+    margin-bottom: 0rem;
     border: 0;
 }
 

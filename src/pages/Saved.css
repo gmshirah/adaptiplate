@@ -1,7 +1,7 @@
 div.container {
     text-align: center;
     padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-bottom: 6rem;
 }
 
 h1 {
@@ -10,10 +10,6 @@ h1 {
 
 #titleText {
     color: #29CC7A;
-}
-
-#scrollableContent {
-    padding-bottom: 4rem;
 }
 
 .card {

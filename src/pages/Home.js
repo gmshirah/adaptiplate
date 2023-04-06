@@ -36,7 +36,7 @@ const RecipeCard = ({ recipe, path }) => {
   return (
     <Col md={6}>
       <Link to="/recipe" onClick={handleClick}>
-        <Card>
+        <Card id="recipeCard">
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
             <h4 id="recipeTitle">{recipe.name}</h4>
@@ -71,7 +71,7 @@ function Home() {
         </InputGroup>
       </Form>
       <h3 id="headingText">Recently Viewed</h3>
-      <div id="scrollableContent">
+      <div>
         <Row>
           {recipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />

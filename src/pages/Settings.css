@@ -1,7 +1,7 @@
 div.container {
     text-align: center;
     padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-bottom: 6rem;
 }
 
 h1 {
@@ -20,7 +20,6 @@ h1 {
 
 #settings {
     text-align: start;
-    padding-bottom: 4rem;
 }
 
 #setting,

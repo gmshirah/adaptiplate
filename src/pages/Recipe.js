@@ -165,7 +165,7 @@ function Recipe() {
         </InputGroup>
       </Form>
 
-      <h1 id="titleText">{recipe.name}</h1>
+      <h1 id="recipeTitleText">{recipe.name}</h1>
 
       {/* FOOD IMAGE  */}
       <Image id="recipeImage" src="https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg" />
@@ -191,9 +191,9 @@ function Recipe() {
         </div>
       </div>
 
-      <h3>Ingredients</h3>
+      <h3 id="ingredientsHeading">Ingredients</h3>
 
-      <div id="scrollableContent">
+      <div>
         {subs && subs.map(ingredient =>
           <Accordion>
             <Ingredient key={ingredient.id} ingredient={ingredient} />
