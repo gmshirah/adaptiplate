@@ -2,25 +2,25 @@ import './Login.css';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import
-  {
-    Button,
-    Container,
-    Form
-  } from 'react-bootstrap';
+{
+  Button,
+  Container,
+  Form
+} from 'react-bootstrap';
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import
-  {
-    getAuth,
-    signInWithEmailAndPassword
-  } from "firebase/auth";
+{
+  getAuth,
+  signInWithEmailAndPassword
+} from "firebase/auth";
 import
-  {
-    getDatabase,
-    ref,
-    get,
-    child
-  } from "firebase/database";
+{
+  getDatabase,
+  ref,
+  get,
+  child
+} from "firebase/database";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -103,4 +103,4 @@ function Login ()
   );
 }
 
-export default Login;
+export { auth, Login as default };
