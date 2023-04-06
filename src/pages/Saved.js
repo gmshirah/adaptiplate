@@ -87,7 +87,6 @@ function Saved ()
           onlyOnce: false
         });
       }
-      console.log("onAuthStateChanged called");
       setLoggedIn(currentUser != null);
     });
   }, [] );
