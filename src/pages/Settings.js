@@ -57,6 +57,7 @@ function Settings ()
         const dbRef = ref(getDatabase());
         remove(child(dbRef, `users/${uid}`)).then(() => {
           setUserData([]);
+          setPassword("");
           setDeleteUserConfirm(false);
         }).catch((error) => {
           console.error(error);
@@ -97,7 +98,7 @@ function Settings ()
           <Form.Control type="password" placeholder="password" onChange={onPasswordInput} value={password} />
           <hr />
           <div id="deleteAccountButtons">
-            <Button id="deleteAccountBtn" variant="danger" onClick={() => {setDeleteUserConfirm(false);}}>Cancel</Button>
+            <Button id="deleteAccountBtn" variant="danger" onClick={() => {setPassword(""); setDeleteUserConfirm(false);}}>Cancel</Button>
             <Button id="deleteAccountBtn" variant="danger" type="submit">Proceed</Button>
           </div>
         </Form>
