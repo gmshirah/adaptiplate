@@ -4,12 +4,9 @@ div.container {
     padding-bottom: 2rem;
 }
 
-h1 {
-    padding-bottom: 1rem;
-}
-
 #titleText {
     color: #29CC7A;
+    padding-bottom: 1rem;
 }
 
 #searchBtn {
@@ -24,7 +21,8 @@ h1 {
     text-decoration: none;
 }
 
-h3 {
+#headingText {
+    padding-top: 0rem;
     padding-bottom: 1rem;
 }
 

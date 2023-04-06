@@ -56,7 +56,7 @@ function Home() {
   return (
     <Container>
       <h1 id="titleText">Welcome!</h1>
-      <h3>Paste a recipe link below</h3>
+      <h3 id="headingText">Paste a recipe link below</h3>
       <Form>
         <InputGroup>
           <Form.Control type="text" />
@@ -70,7 +70,7 @@ function Home() {
           </Button>
         </InputGroup>
       </Form>
-      <h3>Recently Viewed</h3>
+      <h3 id="headingText">Recently Viewed</h3>
       <div id="scrollableContent">
         <Row>
           {recipes.map((recipe) => (
