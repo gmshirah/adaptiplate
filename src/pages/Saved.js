@@ -11,7 +11,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/database";
 import { useEffect, useState } from 'react';
-import { auth } from './Login.js';
+import Login, { auth } from './Login.js';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const RecipeCard = ( { recipe, path } ) =>
@@ -43,56 +43,61 @@ function Saved ()
 {
 
   const [ savedRecipes, setSavedRecipes ] = useState( [] );
-
-  onAuthStateChanged( auth, ( user ) =>
+  useEffect( () =>
   {
-    if ( user )
+    if ( auth.currentUser )
     {
-      useEffect( () =>
-      {
-        const recipeIdsRef = firebase.database().ref( `users/${ auth.currentUser.uid }/recipes` );
-        recipeIdsRef.once( 'value' )
-          .then( ( snapshot ) =>
+      const recipeIdsRef = firebase.database().ref( `users/${ auth.currentUser.uid }/recipes` );
+      recipeIdsRef.once( 'value' )
+        .then( ( snapshot ) =>
+        {
+          const tempSavedRecipes = [];
+          snapshot.forEach( ( element ) =>
           {
-            const tempSavedRecipes = [];
-            snapshot.forEach( ( element ) =>
-            {
-              const recipeId = element.val();
-              const recipeRef = firebase.database().ref( `recipes/${ recipeId }` );
-              recipeRef.once( 'value' )
-                .then( ( recipeSnapshot ) =>
-                {
-                  const recipeData = recipeSnapshot.val();
-                  tempSavedRecipes.push( recipeData );
-                  setSavedRecipes( tempSavedRecipes );
-                } );
-            } );
-          } )
-          .catch( ( error ) =>
-          {
-            console.error( error );
+            const recipeId = element.val();
+            const recipeRef = firebase.database().ref( `recipes/${ recipeId }` );
+            recipeRef.once( 'value' )
+              .then( ( recipeSnapshot ) =>
+              {
+                const recipeData = recipeSnapshot.val();
+                tempSavedRecipes.push( recipeData );
+                setSavedRecipes( tempSavedRecipes );
+              } );
           } );
-      }, [] );
+        } )
+        .catch( ( error ) =>
+        {
+          console.error( error );
+        } );
     } else
     {
       setSavedRecipes( [] );
     }
-  } )
 
-
+  }, [ auth.currentUser ] );
 
   return (
     <Container>
       <h1 id="titleText">Saved Recipes</h1>
-      <div id="scrollableContent">
-        <Row>
-          {savedRecipes.map( ( recipe ) => (
-            <RecipeCard recipe={recipe} />
-          ) )}
-        </Row>
-      </div>
+      {auth.currentUser ? (
+        <div id="scrollableContent">
+          <Row>
+            {savedRecipes.map( ( recipe ) => (
+              <RecipeCard recipe={recipe} />
+            ) )}
+          </Row>
+        </div>
+      ) : (
+        <div>
+          <Link to="/login">
+            <button class="loginButton">Login</button>
+          </Link>
+        </div>
+      )}
+
     </Container>
   );
+
 }
 
 export default Saved;
