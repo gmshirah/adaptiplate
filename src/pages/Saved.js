@@ -84,12 +84,8 @@ function Saved ()
       }, {
         onlyOnce: false
       });
-    } else
-    {
-      setSavedRecipes( [] );
     }
-
-  }, [ user ] );
+  }, [user] );
 
   return (
     <Container>

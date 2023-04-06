@@ -40,7 +40,7 @@ function Settings ()
         alert("Error retrieving user data.");
       });
     }
-  }, [] );
+  }, [user] );
 
   const onSignOut = e => {
     signOut(auth)
