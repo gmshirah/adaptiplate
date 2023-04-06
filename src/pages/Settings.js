@@ -2,12 +2,15 @@ import './Settings.css';
 import { app } from '../index.js';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ListGroup, Container, Image } from 'react-bootstrap';
+import { ListGroup, Container, Image, Alert, Button, Form } from 'react-bootstrap';
 import
 {
   getAuth,
   onAuthStateChanged,
-  signOut
+  signOut,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider
 } from "firebase/auth";
 import
 {
@@ -15,7 +18,8 @@ import
   ref,
   get,
   child,
-  onValue
+  onValue,
+  remove
 } from "firebase/database";
 
 function Settings ()
@@ -25,8 +29,13 @@ function Settings ()
   // const user = auth.currentUser;
 
   const [loggedIn, setLoggedIn] = useState(false);
+  const [deleteUserConfirm, setDeleteUserConfirm] = useState(false);
 
   const [userData, setUserData] = useState([]);
+
+  const [password, setPassword] = useState("");
+
+  const onPasswordInput = ( { target: { value } } ) => setPassword( value );
 
   const onSignOut = e => {
     signOut(auth)
@@ -36,6 +45,30 @@ function Settings ()
         console.error(error);
         alert("Error signing out. Please try again!");
       });
+  }
+
+  const onDeleteUser = e => {
+    const credential = EmailAuthProvider.credential(auth.currentUser.email, password);
+    reauthenticateWithCredential(auth.currentUser, credential).then(() => {
+      // User re-authenticated.
+      const uid = auth.currentUser.uid;
+      deleteUser(auth.currentUser).then(() => {
+        // User deleted
+        const dbRef = ref(getDatabase());
+        remove(child(dbRef, `users/${uid}`)).then(() => {
+          setUserData([]);
+          setDeleteUserConfirm(false);
+        }).catch((error) => {
+          console.error(error);
+        });
+      }).catch((error) => {
+        console.error(error);
+        alert("Failed to delete user account. Please try again!");
+      });
+    }).catch((error) => {
+      console.error(error);
+      alert("Failed to authenticate user account. Please try again!");
+    });
   }
 
   useEffect(() => {
@@ -54,6 +87,23 @@ function Settings ()
       setLoggedIn(currentUser != null);
     });
   }, []);
+
+  if (deleteUserConfirm) {
+    return (
+      <Alert id="deleteAccountAlert" variant="danger">
+        <Alert.Heading>Delete Account</Alert.Heading>
+        <p>This action will permanently delete your account ({userData.email}). Please enter your password to proceed.</p>
+        <Form id="passwordConfirmForm" onSubmit={onDeleteUser}>
+          <Form.Control type="password" placeholder="password" onChange={onPasswordInput} value={password} />
+          <hr />
+          <div id="deleteAccountButtons">
+            <Button id="deleteAccountBtn" variant="danger" onClick={() => {setDeleteUserConfirm(false);}}>Cancel</Button>
+            <Button id="deleteAccountBtn" variant="danger" type="submit">Proceed</Button>
+          </div>
+        </Form>
+      </Alert>
+    );
+  }
 
   return (
     <Container>
@@ -98,7 +148,7 @@ function Settings ()
                 navigate_next
               </span>
             </ListGroup.Item>
-            <ListGroup.Item id="deleteAccount">
+            <ListGroup.Item id="deleteAccount" onClick={() => {setDeleteUserConfirm(true);}}>
               <span id="settingText">Delete Account</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
