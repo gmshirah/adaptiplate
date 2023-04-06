@@ -11,7 +11,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/database";
 import { useEffect, useState } from 'react';
-import Login, { auth } from './Login.js';
+import { auth } from './Login.js';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const RecipeCard = ( { recipe, path } ) =>
@@ -78,14 +78,17 @@ function Saved ()
 
   return (
     <Container>
-      <h1 id="titleText">Saved Recipes</h1>
+
       {auth.currentUser ? (
-        <div id="scrollableContent">
-          <Row>
-            {savedRecipes.map( ( recipe ) => (
-              <RecipeCard recipe={recipe} />
-            ) )}
-          </Row>
+        <div>
+          <h1 id="titleText">Saved Recipes</h1>
+          <div id="scrollableContent">
+            <Row>
+              {savedRecipes.map( ( recipe ) => (
+                <RecipeCard recipe={recipe} />
+              ) )}
+            </Row>
+          </div>
         </div>
       ) : (
         <div>
