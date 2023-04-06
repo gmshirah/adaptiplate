@@ -11,6 +11,7 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/database";
 import { useEffect, useState } from 'react';
+import { auth } from './Login.js';
 
 const RecipeCard = ( { recipe, path } ) =>
 {
@@ -40,24 +41,10 @@ const RecipeCard = ( { recipe, path } ) =>
 function Saved ()
 {
 
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyBlPgsYfKfSl15rkPbRzdX_7pjf3N5i424",
-    authDomain: "adaptipla.firebaseapp.com",
-    databaseURL: "https://adaptipla-default-rtdb.firebaseio.com",
-    projectId: "adaptipla",
-    storageBucket: "adaptipla.appspot.com",
-    messagingSenderId: "826210962785",
-    appId: "1:826210962785:web:1ba40a0510126f3dc54920",
-    measurementId: "G-235FB92HNR"
-  };
-
-  firebase.initializeApp( firebaseConfig );
-
   const [ savedRecipes, setSavedRecipes ] = useState( [] );
   useEffect( () =>
   {
-    const recipeIdsRef = firebase.database().ref( `users/-NSD9UtFvXgxz4Mwgbmm/recipes` );
+    const recipeIdsRef = firebase.database().ref( `users/${ auth.currentUser.uid }/recipes` );
     recipeIdsRef.once( 'value' )
       .then( ( snapshot ) =>
       {
