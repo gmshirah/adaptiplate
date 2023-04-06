@@ -1,4 +1,5 @@
 import './Signup.css';
+import { app } from '../index.js';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -10,7 +11,8 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import {
     getAuth,
-    createUserWithEmailAndPassword
+    createUserWithEmailAndPassword,
+    signOut
 } from "firebase/auth";
 import {
     getDatabase,
@@ -24,29 +26,13 @@ const agreement = "I understand this application was created in the context \
         acknowledge that I have the ability to delete my account information \
         from this platform at any time."
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBlPgsYfKfSl15rkPbRzdX_7pjf3N5i424",
-  authDomain: "adaptipla.firebaseapp.com",
-  databaseURL: "https://adaptipla-default-rtdb.firebaseio.com",
-  projectId: "adaptipla",
-  storageBucket: "adaptipla.appspot.com",
-  messagingSenderId: "826210962785",
-  appId: "1:826210962785:web:1ba40a0510126f3dc54920",
-  measurementId: "G-235FB92HNR"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
-
-// Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth(app);
-const user = auth.currentUser;
-
 function Signup() {
+  // Initialize Firebase Authentication and get a reference to the service
+  const auth = getAuth(app);
+  const user = auth.currentUser;
+
   const [validated, setValidated] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(user != null);
 
   const navigate = useNavigate();
 
@@ -73,6 +59,7 @@ function Signup() {
             email: email
           });
           
+          setLoggedIn(true);
           navigate("/");
         })
         .catch((error) => {
@@ -82,6 +69,29 @@ function Signup() {
         });
     }
     setValidated(true);
+  }
+
+  const onSignOut = e => {
+    signOut(auth)
+      .then(() => {
+        setEmail("");
+        setUsername("");
+        setPassword("");
+        setLoggedIn(false);
+      }).catch((error) => {
+        console.error(error);
+        alert("Error signing out. Please try again!");
+      });
+  }
+
+  if (loggedIn) {
+    return (
+      <Container>
+        <h1 id="titleText">Sign Up</h1>
+        <h3>Already Signed In</h3>
+        <Button variant="secondary" onClick={() => {onSignOut();}}>Sign Out</Button>
+      </Container>
+    );
   }
 
   return (

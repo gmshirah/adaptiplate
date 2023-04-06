@@ -1,4 +1,6 @@
 import './Saved.css';
+import { app } from '../index.js';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import
 {
@@ -7,12 +9,19 @@ import
   Col,
   Card
 } from 'react-bootstrap';
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/database";
-import { useEffect, useState } from 'react';
-import { auth } from './Login.js';
-import { onAuthStateChanged } from 'firebase/auth';
+import
+{
+  getAuth,
+  onAuthStateChanged
+} from "firebase/auth";
+import
+{
+  getDatabase,
+  ref,
+  get,
+  child,
+  onValue
+} from "firebase/database";
 
 const RecipeCard = ( { recipe, path } ) =>
 {
@@ -41,45 +50,50 @@ const RecipeCard = ( { recipe, path } ) =>
 
 function Saved ()
 {
+  // Initialize Firebase Authentication and get a reference to the service
+  const auth = getAuth( app );
+  const user = auth.currentUser;
 
-  const [ savedRecipes, setSavedRecipes ] = useState( [] );
+  const [userData, setUserData] = useState([]);
+  const [savedRecipes, setSavedRecipes] = useState([]);
+
   useEffect( () =>
   {
-    if ( auth.currentUser )
+    if ( user )
     {
-      const recipeIdsRef = firebase.database().ref( `users/${ auth.currentUser.uid }/recipes` );
-      recipeIdsRef.once( 'value' )
-        .then( ( snapshot ) =>
-        {
-          const tempSavedRecipes = [];
-          snapshot.forEach( ( element ) =>
-          {
-            const recipeId = element.val();
-            const recipeRef = firebase.database().ref( `recipes/${ recipeId }` );
-            recipeRef.once( 'value' )
-              .then( ( recipeSnapshot ) =>
-              {
-                const recipeData = recipeSnapshot.val();
-                tempSavedRecipes.push( recipeData );
-                setSavedRecipes( tempSavedRecipes );
-              } );
-          } );
-        } )
-        .catch( ( error ) =>
-        {
-          console.error( error );
-        } );
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `users/${user.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          setUserData(snapshot.val());
+        }
+      }).catch((error) => {
+        console.error(error);
+        alert("Error retrieving user data.");
+      });
+
+      const db = getDatabase();
+      const dbSavedRecipesRef = ref(db, `users/${user.uid}/recipes`);
+      onValue(dbSavedRecipesRef, (snapshot) => {
+        let arr = [];
+        snapshot.forEach((recipeSnapshot) => {
+          const recipeData = recipeSnapshot.val();
+          arr.push(recipeData);
+        });
+        arr.reverse();
+        setSavedRecipes(arr);
+      }, {
+        onlyOnce: false
+      });
     } else
     {
       setSavedRecipes( [] );
     }
 
-  }, [ auth.currentUser ] );
+  }, [ user ] );
 
   return (
     <Container>
-
-      {auth.currentUser ? (
+      {user ? (
         <div>
           <h1 id="titleText">Saved Recipes</h1>
           <div id="scrollableContent">
@@ -97,7 +111,6 @@ function Saved ()
           </Link>
         </div>
       )}
-
     </Container>
   );
 

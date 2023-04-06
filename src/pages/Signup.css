@@ -8,6 +8,11 @@ h1 {
     padding-bottom: 1rem;
 }
 
+h3 {
+    padding-top: 3rem;
+    padding-bottom: 1rem;
+}
+
 #titleText {
     color: #29CC7A;
 }

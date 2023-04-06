@@ -1,4 +1,5 @@
 import './Login.css';
+import { app } from '../index.js';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import
@@ -7,12 +8,11 @@ import
   Container,
   Form
 } from 'react-bootstrap';
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
 import
 {
   getAuth,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  signOut
 } from "firebase/auth";
 import
 {
@@ -22,30 +22,13 @@ import
   child
 } from "firebase/database";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBlPgsYfKfSl15rkPbRzdX_7pjf3N5i424",
-  authDomain: "adaptipla.firebaseapp.com",
-  databaseURL: "https://adaptipla-default-rtdb.firebaseio.com",
-  projectId: "adaptipla",
-  storageBucket: "adaptipla.appspot.com",
-  messagingSenderId: "826210962785",
-  appId: "1:826210962785:web:1ba40a0510126f3dc54920",
-  measurementId: "G-235FB92HNR"
-};
-
-// Initialize Firebase
-const app = initializeApp( firebaseConfig );
-const analytics = getAnalytics( app );
-
-// Initialize Firebase Authentication and get a reference to the service
-const auth = getAuth( app );
-const user = auth.currentUser;
-
 function Login ()
 {
-  const [ userData, setUserData ] = useState( [] );
+  // Initialize Firebase Authentication and get a reference to the service
+  const auth = getAuth( app );
+  const user = auth.currentUser;
+
+  const [loggedIn, setLoggedIn] = useState(user != null);
 
   const navigate = useNavigate();
 
@@ -60,19 +43,8 @@ function Login ()
     signInWithEmailAndPassword( auth, email, password )
       .then( ( userCredential ) =>
       {
-        // Signed in 
-        const dbRef = ref( getDatabase() );
-        get( child( dbRef, `users/${ userCredential.user.uid }` ) ).then( ( snapshot ) =>
-        {
-          if ( snapshot.exists() )
-          {
-            setUserData( snapshot.val() );
-          }
-        } ).catch( ( error ) =>
-        {
-          console.error( error );
-        } );
-
+        // Signed in
+        setLoggedIn(true);
         navigate( "/" );
       } )
       .catch( ( error ) =>
@@ -82,6 +54,28 @@ function Login ()
         console.log( errorCode + ": " + errorMessage );
         alert( "Error logging in to your account. Please try again!" );
       } );
+  }
+
+  const onSignOut = e => {
+    signOut(auth)
+      .then(() => {
+        setEmail("");
+        setPassword("");
+        setLoggedIn(false);
+      }).catch((error) => {
+        console.error(error);
+        alert("Error signing out. Please try again!");
+      });
+  }
+
+  if (loggedIn) {
+    return (
+      <Container>
+        <h1 id="titleText">Login</h1>
+        <h3>Already Signed In</h3>
+        <Button variant="secondary" onClick={() => {onSignOut();}}>Sign Out</Button>
+      </Container>
+    );
   }
 
   return (
@@ -103,4 +97,4 @@ function Login ()
   );
 }
 
-export { auth, Login as default };
+export default Login;

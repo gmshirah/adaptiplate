@@ -1,14 +1,60 @@
 import './Settings.css';
+import { app } from '../index.js';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ListGroup, Container, Image } from 'react-bootstrap';
-import { auth } from './Login.js';
+import
+{
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "firebase/auth";
+import
+{
+  getDatabase,
+  ref,
+  get,
+  child,
+  onValue
+} from "firebase/database";
 
 function Settings ()
 {
-  return (
+  // Initialize Firebase Authentication and get a reference to the service
+  const auth = getAuth( app );
+  const user = auth.currentUser;
 
+  const [userData, setUserData] = useState([]);
+
+  useEffect( () =>
+  {
+    if ( user )
+    {
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `users/${user.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          setUserData(snapshot.val());
+        }
+      }).catch((error) => {
+        console.error(error);
+        alert("Error retrieving user data.");
+      });
+    }
+  }, [] );
+
+  const onSignOut = e => {
+    signOut(auth)
+      .then(() => {
+        setUserData([]);
+      }).catch((error) => {
+        console.error(error);
+        alert("Error signing out. Please try again!");
+      });
+  }
+
+  return (
     <Container>
-      {auth.currentUser ? (
+      {user ? (
         <div>
           <h1 id="titleText">Settings</h1>
           <Image id="accountImage" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" roundedCircle fluid thumbnail />
@@ -43,8 +89,8 @@ function Settings ()
                 navigate_next
               </span>
             </ListGroup.Item>
-            <ListGroup.Item id="setting">
-              <span id="settingText">Log Out</span>
+            <ListGroup.Item id="setting" onClick={() => {onSignOut();}}>
+              <span id="settingText">Sign Out</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
               </span>
@@ -64,7 +110,6 @@ function Settings ()
           </Link>
         </div>
       )}
-
     </Container>
   );
 }
