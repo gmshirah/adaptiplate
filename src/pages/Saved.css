@@ -57,7 +57,7 @@ h1 {
     width: 50%;
 }
 
-.loginButton {
+#loginButton {
     background-color: #29CC7A;
     border-radius: 30px;
     border: none;

@@ -52,44 +52,49 @@ function Saved ()
 {
   // Initialize Firebase Authentication and get a reference to the service
   const auth = getAuth( app );
-  const user = auth.currentUser;
+  // const user = auth.currentUser;
+
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const [userData, setUserData] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
 
   useEffect( () =>
   {
-    if ( user )
-    {
-      const dbRef = ref(getDatabase());
-      get(child(dbRef, `users/${user.uid}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          setUserData(snapshot.val());
-        }
-      }).catch((error) => {
-        console.error(error);
-        alert("Error retrieving user data.");
-      });
-
-      const db = getDatabase();
-      const dbSavedRecipesRef = ref(db, `users/${user.uid}/recipes`);
-      onValue(dbSavedRecipesRef, (snapshot) => {
-        let arr = [];
-        snapshot.forEach((recipeSnapshot) => {
-          const recipeData = recipeSnapshot.val();
-          arr.push(recipeData);
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            setUserData(snapshot.val());
+          }
+        }).catch((error) => {
+          console.error(error);
+          alert("Error retrieving user data.");
         });
-        arr.reverse();
-        setSavedRecipes(arr);
-      }, {
-        onlyOnce: false
-      });
-    }
-  }, [user] );
+
+        const db = getDatabase();
+        const dbSavedRecipesRef = ref(db, `users/${currentUser.uid}/recipes`);
+        onValue(dbSavedRecipesRef, (snapshot) => {
+          let arr = [];
+          snapshot.forEach((recipeSnapshot) => {
+            const recipeData = recipeSnapshot.val();
+            arr.push(recipeData);
+          });
+          arr.reverse();
+          setSavedRecipes(arr);
+        }, {
+          onlyOnce: false
+        });
+      }
+      console.log("onAuthStateChanged called");
+      setLoggedIn(currentUser != null);
+    });
+  }, [] );
 
   return (
     <Container>
-      {user ? (
+      {loggedIn ? (
         <div>
           <h1 id="titleText">Saved Recipes</h1>
           <div id="scrollableContent">
@@ -103,7 +108,7 @@ function Saved ()
       ) : (
         <div>
           <Link to="/login">
-            <button class="loginButton">Login</button>
+            <button id="loginButton">Login</button>
           </Link>
         </div>
       )}

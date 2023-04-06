@@ -22,25 +22,11 @@ function Settings ()
 {
   // Initialize Firebase Authentication and get a reference to the service
   const auth = getAuth( app );
-  const user = auth.currentUser;
+  // const user = auth.currentUser;
+
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const [userData, setUserData] = useState([]);
-
-  useEffect( () =>
-  {
-    if ( user )
-    {
-      const dbRef = ref(getDatabase());
-      get(child(dbRef, `users/${user.uid}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-          setUserData(snapshot.val());
-        }
-      }).catch((error) => {
-        console.error(error);
-        alert("Error retrieving user data.");
-      });
-    }
-  }, [user] );
 
   const onSignOut = e => {
     signOut(auth)
@@ -52,9 +38,26 @@ function Settings ()
       });
   }
 
+  useEffect(() => {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            setUserData(snapshot.val());
+          }
+        }).catch((error) => {
+          console.error(error);
+          alert("Error retrieving user data.");
+        });
+      }
+      setLoggedIn(currentUser != null);
+    });
+  }, []);
+
   return (
     <Container>
-      {user ? (
+      {loggedIn ? (
         <div>
           <h1 id="titleText">Settings</h1>
           <Image id="accountImage" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" roundedCircle fluid thumbnail />
@@ -106,7 +109,7 @@ function Settings ()
       ) : (
         <div>
           <Link to="/login">
-            <button class="loginButton">Login</button>
+            <button id="loginButton">Login</button>
           </Link>
         </div>
       )}
