@@ -12,6 +12,7 @@ import "firebase/compat/auth";
 import "firebase/compat/database";
 import { useEffect, useState } from 'react';
 import { auth } from './Login.js';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const RecipeCard = ( { recipe, path } ) =>
 {
@@ -42,31 +43,42 @@ function Saved ()
 {
 
   const [ savedRecipes, setSavedRecipes ] = useState( [] );
-  useEffect( () =>
+
+  onAuthStateChanged( auth, ( user ) =>
   {
-    const recipeIdsRef = firebase.database().ref( `users/${ auth.currentUser.uid }/recipes` );
-    recipeIdsRef.once( 'value' )
-      .then( ( snapshot ) =>
+    if ( user )
+    {
+      useEffect( () =>
       {
-        const tempSavedRecipes = [];
-        snapshot.forEach( ( element ) =>
-        {
-          const recipeId = element.val();
-          const recipeRef = firebase.database().ref( `recipes/${ recipeId }` );
-          recipeRef.once( 'value' )
-            .then( ( recipeSnapshot ) =>
+        const recipeIdsRef = firebase.database().ref( `users/${ auth.currentUser.uid }/recipes` );
+        recipeIdsRef.once( 'value' )
+          .then( ( snapshot ) =>
+          {
+            const tempSavedRecipes = [];
+            snapshot.forEach( ( element ) =>
             {
-              const recipeData = recipeSnapshot.val();
-              tempSavedRecipes.push( recipeData );
-              setSavedRecipes( tempSavedRecipes );
+              const recipeId = element.val();
+              const recipeRef = firebase.database().ref( `recipes/${ recipeId }` );
+              recipeRef.once( 'value' )
+                .then( ( recipeSnapshot ) =>
+                {
+                  const recipeData = recipeSnapshot.val();
+                  tempSavedRecipes.push( recipeData );
+                  setSavedRecipes( tempSavedRecipes );
+                } );
             } );
-        } );
-      } )
-      .catch( ( error ) =>
-      {
-        console.error( error );
-      } );
-  }, [] );
+          } )
+          .catch( ( error ) =>
+          {
+            console.error( error );
+          } );
+      }, [] );
+    } else
+    {
+      setSavedRecipes( [] );
+    }
+  } )
+
 
 
   return (
