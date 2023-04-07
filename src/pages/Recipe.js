@@ -1,6 +1,6 @@
 import './Recipe.css';
-import { Link, useLoaderData, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
   Accordion,
   Button,
@@ -174,6 +174,23 @@ function Recipe() {
   let [loggedIn, setLoggedIn] = useState({});
 
   let navigate = useNavigate();
+  let params = useParams();
+
+  const [recipeData, setRecipeData] = useState([]);
+  const [ingredientData, setIngredientData] = useState([]);
+
+  
+  useEffect(() => {
+    const dbRef = ref(getDatabase());
+    get(child(dbRef, `recipes/${params.id}`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        setRecipeData(snapshot.val());
+        setIngredientData(snapshot.val().ingredients);
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+  }, []);
 
   const LoadRecipeData = (() => {
     get(child(dbRef, 'users/-NSD9UtFvXgxz4Mwgbmm')).then((userSnapshot) => {
@@ -186,7 +203,7 @@ function Recipe() {
             let key = userSnapshot.val().recipes[favRecipe].id;
             get(child(dbRef, 'recipes/' + key)).then((recipeSnapshot) => {
               console.log(recipeSnapshot.val());
-              if (recipeSnapshot && recipeSnapshot.val().name === recipe.name) {
+              if (recipeSnapshot.val() && recipeSnapshot.val().name === recipe.name) {
                 setFavorite(true);
               }
             })
@@ -265,36 +282,36 @@ function Recipe() {
         </InputGroup>
       </Form>
 
-      <h1 id="recipeTitleText">{recipe.name}</h1>
+      <h1 id="recipeTitleText">{recipeData.name}</h1>
 
       {/* FOOD IMAGE  */}
-      <Image id="recipeImage" src={recipe.img} />
+      <Image id="recipeImage" src={recipeData.img} />
 
       <div id="recipeInfo">
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             payments
           </div>
-          <p id="statText">{recipe.price}</p>
+          <p id="statText">{recipeData.price}</p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             favorite
           </div>
-          <p id="statText">{recipe.health}</p>
+          <p id="statText">{recipeData.health}</p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             schedule
           </div>
-          <p id="statText">{recipe.time}</p>
+          <p id="statText">{recipeData.time}</p>
         </div>
       </div>
 
       <h3 id="ingredientsHeading">Ingredients</h3>
 
       <div>
-        {subs && subs.map(ingredient =>
+        {ingredientData.map(ingredient =>
           <Accordion>
             <Ingredient key={ingredient.id} ingredient={ingredient} />
           </Accordion>
