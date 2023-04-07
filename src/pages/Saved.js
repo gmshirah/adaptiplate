@@ -31,7 +31,7 @@ const RecipeCard = ( { recipe, path } ) =>
 
   return (
     <Col md={6}>
-      <Link to="/recipe" onClick={handleClick}>
+      <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
         <Card>
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
