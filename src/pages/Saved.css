@@ -1,19 +1,11 @@
 div.container {
     text-align: center;
     padding-top: 2rem;
-    padding-bottom: 2rem;
-}
-
-h1 {
-    padding-bottom: 1rem;
+    padding-bottom: 6rem;
 }
 
 #titleText {
-    color: #33DB80;
-}
-
-#scrollableContent {
-    padding-bottom: 4rem;
+    color: #29CC7A;
 }
 
 .card {
@@ -55,4 +47,21 @@ h1 {
     align-items: flex-end;
     flex-direction: column;
     width: 50%;
+}
+
+#loginButton {
+    background-color: #29CC7A;
+    border-radius: 30px;
+    border: none;
+    font-size: 24px;
+    font-weight: bold;
+    width: 200px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

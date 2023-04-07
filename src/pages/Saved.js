@@ -1,52 +1,43 @@
 import './Saved.css';
+import { app } from '../index.js';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
+import
+{
   Container,
   Row,
   Col,
   Card
 } from 'react-bootstrap';
+import
+{
+  getAuth,
+  onAuthStateChanged
+} from "firebase/auth";
+import
+{
+  getDatabase,
+  ref,
+  get,
+  child,
+  onValue
+} from "firebase/database";
 
-const recipes = [
+const RecipeCard = ( { recipe, path } ) =>
+{
+  const handleClick = ( event ) =>
   {
-    id: 1,
-    name: 'Spaghetti',
-    img: 'https://www.allrecipes.com/thmb/ASRzxoRrPoMLQEpczFvU7osJNF4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/21353-italian-spaghetti-sauce-with-meatballs-2x1-141-cedbb650b4264576ab923c91215ce7fc.jpg',
-    cost: '$10',
-    health: 'Healthy',
-    time: '30 min',
-  },
-  {
-    id: 2,
-    name: 'Hamburger',
-    img: 'https://media.cnn.com/api/v1/images/stellar/prod/220428140436-04-classic-american-hamburgers.jpg?c=original',
-    cost: '$8',
-    health: 'Un-Healthy',
-    time: '15 min',
-  },
-  {
-    id: 3,
-    name: 'Chicken Alfredo',
-    img: 'https://hips.hearstapps.com/hmg-prod/images/delish-221130-perfect-chicken-alfredo-0683-eb-1670449995.jpg?crop=1xw:0.8277591973244147xh;center,top',
-    cost: '$12',
-    health: 'Moderate',
-    time: '40 min',
-  },
-];
-
-const RecipeCard = ({ recipe, path }) => {
-  const handleClick = (event) => {
   };
 
   return (
     <Col md={6}>
-      <Link to="/recipe" onClick={handleClick}>
+      <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
         <Card>
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
             <h4 id="recipeTitle">{recipe.name}</h4>
             <div id="recipeStats">
-              <Card.Text>{recipe.cost}</Card.Text>
+              <Card.Text>{recipe.price}</Card.Text>
               <Card.Text>{recipe.health}</Card.Text>
               <Card.Text>{recipe.time}</Card.Text>
             </div>
@@ -57,19 +48,72 @@ const RecipeCard = ({ recipe, path }) => {
   );
 };
 
-function Saved() {
+function Saved ()
+{
+  // Initialize Firebase Authentication and get a reference to the service
+  const auth = getAuth( app );
+  // const user = auth.currentUser;
+
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const [userData, setUserData] = useState([]);
+  const [savedRecipes, setSavedRecipes] = useState([]);
+
+  useEffect( () =>
+  {
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        const dbRef = ref(getDatabase());
+        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            setUserData(snapshot.val());
+          }
+        }).catch((error) => {
+          console.error(error);
+          alert("Error retrieving user data.");
+        });
+
+        const db = getDatabase();
+        const dbSavedRecipesRef = ref(db, `users/${currentUser.uid}/recipes`);
+        onValue(dbSavedRecipesRef, (snapshot) => {
+          let arr = [];
+          snapshot.forEach((recipeSnapshot) => {
+            const recipeData = recipeSnapshot.val();
+            arr.push(recipeData);
+          });
+          arr.reverse();
+          setSavedRecipes(arr);
+        }, {
+          onlyOnce: false
+        });
+      }
+      setLoggedIn(currentUser != null);
+    });
+  }, [] );
+
   return (
     <Container>
-      <h1 id="titleText">Saved Recipes</h1>
-      <div id="scrollableContent">
-        <Row>
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
-        </Row>
-      </div>
+      {loggedIn ? (
+        <div>
+          <h1 id="titleText">Saved Recipes</h1>
+          <div>
+            <Row>
+              {savedRecipes.map( ( recipe ) => (
+                <RecipeCard recipe={recipe} />
+              ) )}
+            </Row>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <Link to="/login">
+            <button id="loginButton">Login</button>
+          </Link>
+        </div>
+      )}
     </Container>
   );
+
 }
 
 export default Saved;
