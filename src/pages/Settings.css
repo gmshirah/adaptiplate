@@ -4,10 +4,6 @@ div.container {
     padding-bottom: 6rem;
 }
 
-h1 {
-    padding-bottom: 1rem;
-}
-
 #titleText {
     color: #29CC7A;
 }
@@ -16,6 +12,7 @@ h1 {
     max-height: 200px;
     max-width: 200px;
     margin-bottom: 2rem;
+    margin-top: 1rem;
 }
 
 #settings {
