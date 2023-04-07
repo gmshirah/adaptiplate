@@ -76,7 +76,6 @@ function Saved ()
 
         getSavedRecipes();
       }
-      console.log("useEffect called");
       setLoggedIn(currentUser != null);
     });
   }, [] );
