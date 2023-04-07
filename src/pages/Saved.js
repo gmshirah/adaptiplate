@@ -32,7 +32,7 @@ const RecipeCard = ( { recipe, path } ) =>
   return (
     <Col md={6}>
       <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
-        <Card>
+        <Card id="recipeCard">
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
             <h4 id="recipeTitle">{recipe.name}</h4>
@@ -62,6 +62,7 @@ function Saved ()
   useEffect( () =>
   {
     onAuthStateChanged(auth, (currentUser) => {
+      setSavedRecipes([]);
       if (currentUser) {
         const dbRef = ref(getDatabase());
         get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
@@ -73,23 +74,37 @@ function Saved ()
           alert("Error retrieving user data.");
         });
 
-        const db = getDatabase();
-        const dbSavedRecipesRef = ref(db, `users/${currentUser.uid}/recipes`);
-        onValue(dbSavedRecipesRef, (snapshot) => {
-          let arr = [];
-          snapshot.forEach((recipeSnapshot) => {
-            const recipeData = recipeSnapshot.val();
-            arr.push(recipeData);
-          });
-          arr.reverse();
-          setSavedRecipes(arr);
-        }, {
-          onlyOnce: false
-        });
+        getSavedRecipes();
       }
+      console.log("useEffect called");
       setLoggedIn(currentUser != null);
     });
   }, [] );
+
+  function getSavedRecipes() {
+    const dbRef = ref(getDatabase());
+    const db = getDatabase();
+    const dbSavedRecipesRef = ref(db, `users/${auth.currentUser.uid}/recipes`);
+    onValue(dbSavedRecipesRef, (snapshot) => {
+      let recipeIds = [];
+      snapshot.forEach((recipeIdSnapshot) => {
+        const recipeId = recipeIdSnapshot.val();
+        recipeIds.push(recipeId);
+      });
+      recipeIds.forEach((id) => {
+        get(child(dbRef, `recipes/${id.id}`)).then((recipeSnapshot) => {
+          if (recipeSnapshot.exists()) {
+            setSavedRecipes(oldArray => [...oldArray, recipeSnapshot.val()]);
+          }
+        }).catch((error) => {
+          console.error(error);
+          alert("Error retrieving recipe data.");
+        });
+      });
+    }, {
+      onlyOnce: false
+    });
+  }
 
   return (
     <Container>
@@ -113,7 +128,6 @@ function Saved ()
       )}
     </Container>
   );
-
 }
 
 export default Saved;

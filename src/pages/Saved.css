@@ -8,8 +8,9 @@ div.container {
     color: #29CC7A;
 }
 
-.card {
-    margin-bottom: 2rem;
+#recipeCard {
+    margin-top: 2rem;
+    margin-bottom: 0rem;
     border: 0;
 }
 
