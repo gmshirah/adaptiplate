@@ -20,12 +20,12 @@ const recipes = [
     time: '30 min',
   },
   {
-    id: 2,
-    name: 'Chicken Alfredo',
-    img: 'https://hips.hearstapps.com/hmg-prod/images/delish-221130-perfect-chicken-alfredo-0683-eb-1670449995.jpg?crop=1xw:0.8277591973244147xh;center,top',
-    cost: '$12',
+    id: 0,
+    name: 'Orange Chicken',
+    img: 'https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg',
+    cost: '$8',
     health: 'Moderate',
-    time: '40 min',
+    time: '30 min',
   },
 ];
 

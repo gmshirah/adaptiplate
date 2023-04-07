@@ -1,4 +1,5 @@
 import './Recipe.css';
+import { app } from '../index.js';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
@@ -19,30 +20,10 @@ import
     ref,
     get,
     set,
-    child
+    child,
+    remove,
+    push
   } from "firebase/database";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBlPgsYfKfSl15rkPbRzdX_7pjf3N5i424",
-  authDomain: "adaptipla.firebaseapp.com",
-  databaseURL: "https://adaptipla-default-rtdb.firebaseio.com",
-  projectId: "adaptipla",
-  storageBucket: "adaptipla.appspot.com",
-  messagingSenderId: "826210962785",
-  appId: "1:826210962785:web:1ba40a0510126f3dc54920",
-  measurementId: "G-235FB92HNR"
-};
-
-// Initialize Firebase
-const app = initializeApp( firebaseConfig );
-
-const auth = getAuth(app);
-
-const db = getDatabase();
-const dbRef = ref(db);
-
-
-
 
 // const DBQuery = (path) => {
 //   console.log(path);
@@ -59,7 +40,6 @@ const dbRef = ref(db);
 //     return -1;
 //   })
 // };
-
 
 const Ingredient = ({ ingredient }) => {
   return (
@@ -86,98 +66,20 @@ const Ingredient = ({ ingredient }) => {
 }
 
 function Recipe() {
-  let [subs, setSubs] = useState(
-    [
-      {
-        id: 1,
-        name: "Chicken",
-        amount: "1/2 LB",
-        subs: [
-          {
-            name: "Tofu",
-            effect: "+ 30g fat"
-          }
-        ]
-      },
-      {
-        id: 2,
-        name: "Flour",
-        amount: "2 Cup",
-        subs: [
-          {
-            name: "Corn Starch",
-            effect: "- 200 calories"
-          },
-          {
-            name: "Almond Flour",
-            effect: "+ 10g protein"
-          }
-        ]
-      },
-      {
-        id: 3,
-        name: "Egg",
-        amount: "2",
-        subs: [
-          {
-            name: "Applesauce",
-            effect: "+ 10g sugar"
-          }
-        ]
-      },
-      {
-        id: 4,
-        name: "Soy Sauce",
-        amount: "2 TBSP",
-        subs: [
-          {
-            name: "Worcestershire Sauce",
-            effect: "- 100g sodium"
-          }
-        ]
-      },
-      {
-        id: 5,
-        name: "Orange Juice",
-        amount: "4 OZ",
-        subs: [
-          {
-            name: "Lemon Juice",
-            effect: "+ 10g sugar"
-          }
-        ]
-      }
-    ]
-  );
+  // Initialize Firebase Authentication and get a reference to the service
+  const auth = getAuth( app );
 
-  let [recipe, setRecipe] = useState({
-    id: 0,
-    name: "Orange Chicken",
-    price: "$$",
-    time: "30 min",
-    health: "moderate",
-    img: "https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg"
-    // rid: 1,
-    // name: 'Spaghetti',
-    // img: 'https://www.allrecipes.com/thmb/ASRzxoRrPoMLQEpczFvU7osJNF4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/21353-italian-spaghetti-sauce-with-meatballs-2x1-141-cedbb650b4264576ab923c91215ce7fc.jpg',
-    // price: '$10',
-    // health: 'Healthy',
-    // time: '30 min',
-  })
-
-  let [dataLoaded, setDataLoaded] = useState(false);
-
-  let [favorite, setFavorite] = useState(false);
+  let [saved, setSaved] = useState(false);
 
   let [loggedIn, setLoggedIn] = useState(false);
 
   let navigate = useNavigate();
   let params = useParams();
 
+  const [userData, setUserData] = useState([]);
   const [recipeData, setRecipeData] = useState([]);
   const [ingredientData, setIngredientData] = useState([]);
 
-  
   useEffect(() => {
     const dbRef = ref(getDatabase());
     get(child(dbRef, `recipes/${params.id}`)).then((snapshot) => {
@@ -188,78 +90,61 @@ function Recipe() {
     }).catch((error) => {
       console.error(error);
     });
+
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            setUserData(snapshot.val());
+          }
+        }).catch((error) => {
+          console.error(error);
+          alert("Error retrieving user data.");
+        });
+      }
+      setLoggedIn(currentUser != null);
+    });
   }, []);
 
-  const LoadRecipeData = (() => {
-    console.log(auth.currentUser.uid);
-    get(child(dbRef, 'users/' + auth.currentUser.uid)).then((userSnapshot) => {
-      console.log(userSnapshot.val())
-      if (userSnapshot.exists) {
-        if (userSnapshot.val().recipes) {
-          const recipes = [];
-          console.log(userSnapshot.val().recipes[0].id);
-          for (let favRecipe in userSnapshot.val().recipes) {
-            let key = userSnapshot.val().recipes[favRecipe].id;
-            get(child(dbRef, 'recipes/' + key)).then((recipeSnapshot) => {
-              console.log(recipeSnapshot.val());
-              if (recipeSnapshot.val() && recipeSnapshot.val().name === recipe.name) {
-                setFavorite(true);
-                console.log("setting fav to true")
-              }
-            })
-          }
-        }
-      } else {
-        console.log("Failure to query DB");
-      }
-    }).catch((error) => {
-      console.error(error);
-    })
-  })
-
-
-
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is signed in
-        setLoggedIn(true);
-        const uid = user.uid;
-        console.log("UID: " + uid + " Name: " + user.displayName + " logged on!");
-      } else {
-        // User is not signed in
-        setLoggedIn(false);
-        console.log("nope!");
+    if (userData.recipes) {
+      for (let id in userData.recipes) {
+        if (userData.recipes[id].id === recipeData.id) {
+          setSaved(true);
+        }
       }
-    });
-    
-    if (loggedIn && !dataLoaded) {
-      console.log("Loading Data...")
-      LoadRecipeData();
-      setDataLoaded(true);
     }
-  }, [LoadRecipeData]);
-
-
-
+  }, [userData, recipeData]);
 
   const SaveButtonClick = (event) => {
-    if (favorite) {
-      // Need to remove from favorites
-      console.log("To remove!");
-
+    const dbRef = ref(getDatabase());
+    if (saved) {
+      // Need to remove from saved
+      remove(child(dbRef, `users/${auth.currentUser.uid}/recipes/${recipeData.id}`)).then(() => {
+        setSaved(false);
+      }).catch((error) => {
+        console.error(error);
+        alert("Error removing from saved recipes. Please try again!");
+      });
     } else {
-      // Need to add to favorites
+      // Need to add to saved
       if (!loggedIn) {
-        console.log("Must be logged in to save");
-        return
+        alert("You must login to save recipes!");
       } else {
-        console.log("To save!");
-        
+        const newRecipeRef = child(dbRef, `users/${auth.currentUser.uid}/recipes/${recipeData.id}`);
+        set(newRecipeRef, {
+            id: recipeData.id
+        });
+        get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            setUserData(snapshot.val());
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
+        setSaved(true);
       }
     }
-    console.log("setting favorite to " + !favorite)
-    setFavorite(!favorite)
   };
 
   const BackButtonClick = (event) => {
@@ -267,7 +152,7 @@ function Recipe() {
   };
 
   const StarSelector = () => {
-    if (favorite) {
+    if (saved) {
       return (
         <span  className="material-symbols-outlined" id="saveIconFilled">
           star
