@@ -18,6 +18,7 @@ import
     getDatabase,
     ref,
     get,
+    set,
     child
   } from "firebase/database";
 
@@ -41,17 +42,7 @@ const db = getDatabase();
 const dbRef = ref(db);
 
 
-onAuthStateChanged(auth, (user) => {
 
-  if (user) {
-    // User is signed in
-    const uid = user.uid;
-    console.log("UID: " + uid + " Name: " + user.displayName + " logged on!");
-  } else {
-    // User is not signed in
-    console.log("nope!");
-  }
-});
 
 // const DBQuery = (path) => {
 //   console.log(path);
@@ -160,18 +151,25 @@ function Recipe() {
   );
 
   let [recipe, setRecipe] = useState({
+    id: 0,
     name: "Orange Chicken",
     price: "$$",
     time: "30 min",
     health: "moderate",
     img: "https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg"
+    // rid: 1,
+    // name: 'Spaghetti',
+    // img: 'https://www.allrecipes.com/thmb/ASRzxoRrPoMLQEpczFvU7osJNF4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/21353-italian-spaghetti-sauce-with-meatballs-2x1-141-cedbb650b4264576ab923c91215ce7fc.jpg',
+    // price: '$10',
+    // health: 'Healthy',
+    // time: '30 min',
   })
 
   let [dataLoaded, setDataLoaded] = useState(false);
 
   let [favorite, setFavorite] = useState(false);
 
-  let [loggedIn, setLoggedIn] = useState({});
+  let [loggedIn, setLoggedIn] = useState(false);
 
   let navigate = useNavigate();
   let params = useParams();
@@ -193,8 +191,9 @@ function Recipe() {
   }, []);
 
   const LoadRecipeData = (() => {
-    get(child(dbRef, 'users/-NSD9UtFvXgxz4Mwgbmm')).then((userSnapshot) => {
-      console.log("joe")
+    console.log(auth.currentUser.uid);
+    get(child(dbRef, 'users/' + auth.currentUser.uid)).then((userSnapshot) => {
+      console.log(userSnapshot.val())
       if (userSnapshot.exists) {
         if (userSnapshot.val().recipes) {
           const recipes = [];
@@ -205,6 +204,7 @@ function Recipe() {
               console.log(recipeSnapshot.val());
               if (recipeSnapshot.val() && recipeSnapshot.val().name === recipe.name) {
                 setFavorite(true);
+                console.log("setting fav to true")
               }
             })
           }
@@ -217,21 +217,49 @@ function Recipe() {
     })
   })
 
+
+
   useEffect(() => {
-
-    console.log("=> useEffect!");
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        setLoggedIn(true);
+        const uid = user.uid;
+        console.log("UID: " + uid + " Name: " + user.displayName + " logged on!");
+      } else {
+        // User is not signed in
+        setLoggedIn(false);
+        console.log("nope!");
+      }
+    });
     
-    if (auth.currentUser) {
-      setLoggedIn(auth.currentUser.uid);
+    if (loggedIn && !dataLoaded) {
+      console.log("Loading Data...")
+      LoadRecipeData();
+      setDataLoaded(true);
     }
-    LoadRecipeData();
-
   }, [LoadRecipeData]);
 
 
 
+
   const SaveButtonClick = (event) => {
-    setFavorite(!favorite);
+    if (favorite) {
+      // Need to remove from favorites
+      console.log("To remove!");
+
+    } else {
+      // Need to add to favorites
+      if (!loggedIn) {
+        console.log("Must be logged in to save");
+        return
+      } else {
+        console.log("To save!");
+        
+      }
+    }
+    console.log("setting favorite to " + !favorite)
+    setFavorite(!favorite)
   };
 
   const BackButtonClick = (event) => {
@@ -241,13 +269,13 @@ function Recipe() {
   const StarSelector = () => {
     if (favorite) {
       return (
-        <span className="material-symbols-outlined" id="saveIconFilled">
+        <span  className="material-symbols-outlined" id="saveIconFilled">
           star
         </span>
       );
     } else {
       return (
-        <span className="material-symbols-outlined" id="saveIcon">
+        <span  className="material-symbols-outlined" id="saveIcon">
           star
         </span>
       );
