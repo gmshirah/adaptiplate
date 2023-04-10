@@ -1,6 +1,8 @@
 import './Home.css';
-import { Link } from 'react-router-dom';
-import {
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import
+{
   Button,
   Col,
   Container,
@@ -20,23 +22,25 @@ const recipes = [
     time: '30 min',
   },
   {
-    id: 2,
-    name: 'Chicken Alfredo',
-    img: 'https://hips.hearstapps.com/hmg-prod/images/delish-221130-perfect-chicken-alfredo-0683-eb-1670449995.jpg?crop=1xw:0.8277591973244147xh;center,top',
-    cost: '$12',
+    id: 0,
+    name: 'Orange Chicken',
+    img: 'https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg',
+    cost: '$8',
     health: 'Moderate',
-    time: '40 min',
+    time: '30 min',
   },
 ];
 
-const RecipeCard = ({ recipe, path }) => {
-  const handleClick = (event) => {
+const RecipeCard = ( { recipe, path } ) =>
+{
+  const handleClick = ( event ) =>
+  {
   };
 
   return (
     <Col md={6}>
-      <Link to="/recipe" onClick={handleClick}>
-        <Card>
+      <Link to={`/recipe/${ recipe.id }`} onClick={handleClick}>
+        <Card id="recipeCard">
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
             <h4 id="recipeTitle">{recipe.name}</h4>
@@ -52,30 +56,49 @@ const RecipeCard = ({ recipe, path }) => {
   );
 };
 
-function Home() {
+function Home ()
+{
+  const navigate = useNavigate();
+
+  const handleNewSearch = async ( event ) =>
+  {
+    event.preventDefault();
+    const input = document.querySelector( 'input[name="searchInput"]' ).value;
+    const regex = /^(http|https):\/\/([\w\d]+\.)+[\w\d]{2,}(\/.*)?$/;
+    if ( regex.test( input ) )
+    {
+      console.log( 'recipe' );
+      navigate( '/recipe' );
+    } else
+    {
+      console.log( 'search' );
+      navigate( '/search' );
+    }
+  };
+
   return (
     <Container>
       <h1 id="titleText">Welcome!</h1>
-      <h3>Paste a recipe link below</h3>
+      <h3 id="headingText">Paste a recipe link below</h3>
       <Form>
         <InputGroup>
-          <Form.Control type="text" />
-          <Button variant="outline-secondary" id="searchBtn" type="submit">
-            {/* <span className="material-symbols-outlined">
+          <Form.Control type="text" name="searchInput" />
+          <Button variant="outline-secondary" id="searchBtn" type="submit" onClick={handleNewSearch}>
+            {<span className="material-symbols-outlined">
               search
-            </span> */}
-            <Link to="/recipe" id="searchLink" className="material-symbols-outlined">
+            </span>}
+            {/* <Link to={dst} id="searchLink" className="material-symbols-outlined">
               search
-            </Link>
+            </Link> */}
           </Button>
         </InputGroup>
       </Form>
-      <h3>Recently Viewed</h3>
-      <div id="scrollableContent">
+      <h3 id="headingText">Recently Viewed</h3>
+      <div>
         <Row>
-          {recipes.map((recipe) => (
+          {recipes.map( ( recipe ) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
-          ))}
+          ) )}
         </Row>
       </div>
     </Container>

@@ -9,6 +9,7 @@ import Saved from './pages/Saved';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Search from './pages/Search';
 import reportWebVitals from './reportWebVitals';
 
 // Import the functions you need from the SDKs you need
@@ -31,10 +32,10 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const app = initializeApp( firebaseConfig );
+const analytics = getAnalytics( app );
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
 root.render(
   <>
     <link
@@ -44,11 +45,12 @@ root.render(
     <HashRouter basename='/'>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/recipe" element={<Recipe />} />
+        <Route path="/recipe/:id" element={<Recipe />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/search" element={<Search />} />
         <Route
           path="*"
           element={<Navigate to="/" replace />}

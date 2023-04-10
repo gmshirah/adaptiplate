@@ -1,6 +1,7 @@
 import './Recipe.css';
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { app } from '../index.js';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
   Accordion,
   Button,
@@ -11,6 +12,34 @@ import {
   Col,
   Image,
 } from 'react-bootstrap';
+import { initializeApp } from "firebase/app";
+import { getAuth , onAuthStateChanged } from "firebase/auth";
+import
+  {
+    getDatabase,
+    ref,
+    get,
+    set,
+    child,
+    remove,
+    push
+  } from "firebase/database";
+
+// const DBQuery = (path) => {
+//   console.log(path);
+//   get(child(dbRef, path)).then((snapshot) => {
+//     if (snapshot.exists && snapshot.val()) {
+//       console.log(snapshot.val())
+//       return snapshot.val();
+//     } else {
+//       console.error("Error: DB data could not be accessed");
+//       return -1;
+//     }
+//   }).catch((error) => {
+//     console.error("DB Query Error: " + error);
+//     return -1;
+//   })
+// };
 
 const Ingredient = ({ ingredient }) => {
   return (
@@ -37,84 +66,85 @@ const Ingredient = ({ ingredient }) => {
 }
 
 function Recipe() {
-  let [subs, setSubs] = useState(
-    [
-      {
-        id: 1,
-        name: "Chicken",
-        amount: "1/2 LB",
-        subs: [
-          {
-            name: "Tofu",
-            effect: "+ 30g fat"
-          }
-        ]
-      },
-      {
-        id: 2,
-        name: "Flour",
-        amount: "2 Cup",
-        subs: [
-          {
-            name: "Corn Starch",
-            effect: "- 200 calories"
-          },
-          {
-            name: "Almond Flour",
-            effect: "+ 10g protein"
-          }
-        ]
-      },
-      {
-        id: 3,
-        name: "Egg",
-        amount: "2",
-        subs: [
-          {
-            name: "Applesauce",
-            effect: "+ 10g sugar"
-          }
-        ]
-      },
-      {
-        id: 4,
-        name: "Soy Sauce",
-        amount: "2 TBSP",
-        subs: [
-          {
-            name: "Worcestershire Sauce",
-            effect: "- 100g sodium"
-          }
-        ]
-      },
-      {
-        id: 5,
-        name: "Orange Juice",
-        amount: "4 OZ",
-        subs: [
-          {
-            name: "Lemon Juice",
-            effect: "+ 10g sugar"
-          }
-        ]
-      }
-    ]
-  );
+  // Initialize Firebase Authentication and get a reference to the service
+  const auth = getAuth( app );
 
-  let [recipe, setRecipe] = useState({
-    name: "Orange Chicken",
-    price: "$$",
-    time: "30 min",
-    health: 2,
-    favorite: false
-  })
+  let [saved, setSaved] = useState(false);
 
-  let [favorite, setFavorite] = useState(false);
+  let [loggedIn, setLoggedIn] = useState(false);
 
   let navigate = useNavigate();
+  let params = useParams();
+
+  const [userData, setUserData] = useState([]);
+  const [recipeData, setRecipeData] = useState([]);
+  const [ingredientData, setIngredientData] = useState([]);
+
+  useEffect(() => {
+    const dbRef = ref(getDatabase());
+    get(child(dbRef, `recipes/${params.id}`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        setRecipeData(snapshot.val());
+        setIngredientData(snapshot.val().ingredients);
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+
+    onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            setUserData(snapshot.val());
+          }
+        }).catch((error) => {
+          console.error(error);
+          alert("Error retrieving user data.");
+        });
+      }
+      setLoggedIn(currentUser != null);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (userData.recipes) {
+      for (let id in userData.recipes) {
+        if (userData.recipes[id].id === recipeData.id) {
+          setSaved(true);
+        }
+      }
+    }
+  }, [userData, recipeData]);
 
   const SaveButtonClick = (event) => {
-    setFavorite(!favorite);
+    const dbRef = ref(getDatabase());
+    if (saved) {
+      // Need to remove from saved
+      remove(child(dbRef, `users/${auth.currentUser.uid}/recipes/${recipeData.id}`)).then(() => {
+        setSaved(false);
+      }).catch((error) => {
+        console.error(error);
+        alert("Error removing from saved recipes. Please try again!");
+      });
+    } else {
+      // Need to add to saved
+      if (!loggedIn) {
+        alert("You must login to save recipes!");
+      } else {
+        const newRecipeRef = child(dbRef, `users/${auth.currentUser.uid}/recipes/${recipeData.id}`);
+        set(newRecipeRef, {
+            id: recipeData.id
+        });
+        get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            setUserData(snapshot.val());
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
+        setSaved(true);
+      }
+    }
   };
 
   const BackButtonClick = (event) => {
@@ -122,15 +152,15 @@ function Recipe() {
   };
 
   const StarSelector = () => {
-    if (favorite) {
+    if (saved) {
       return (
-        <span className="material-symbols-outlined" id="saveIconFilled">
+        <span  className="material-symbols-outlined" id="saveIconFilled">
           star
         </span>
       );
     } else {
       return (
-        <span className="material-symbols-outlined" id="saveIcon">
+        <span  className="material-symbols-outlined" id="saveIcon">
           star
         </span>
       );
@@ -165,36 +195,36 @@ function Recipe() {
         </InputGroup>
       </Form>
 
-      <h1 id="titleText">{recipe.name}</h1>
+      <h1 id="recipeTitleText">{recipeData.name}</h1>
 
       {/* FOOD IMAGE  */}
-      <Image id="recipeImage" src="https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg" />
+      <Image id="recipeImage" src={recipeData.img} />
 
       <div id="recipeInfo">
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             payments
           </div>
-          <p id="statText">{recipe.price}</p>
+          <p id="statText">{recipeData.price}</p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             favorite
           </div>
-          <p id="statText">{recipe.health}</p>
+          <p id="statText">{recipeData.health}</p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             schedule
           </div>
-          <p id="statText">{recipe.time}</p>
+          <p id="statText">{recipeData.time}</p>
         </div>
       </div>
 
-      <h3>Ingredients</h3>
+      <h3 id="ingredientsHeading">Ingredients</h3>
 
-      <div id="scrollableContent">
-        {subs && subs.map(ingredient =>
+      <div>
+        {ingredientData.map(ingredient =>
           <Accordion>
             <Ingredient key={ingredient.id} ingredient={ingredient} />
           </Accordion>
