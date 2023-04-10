@@ -56,15 +56,7 @@ function Signup() {
           const db = getDatabase();
           set(ref(db, 'users/' + userCredential.user.uid), {
             uid: username,
-            email: email,
-            recipes: [{}],
-            settings:{        
-              "appearance": "0",
-              "dietary": "0",
-              "financial": "0",
-              "name": "0",
-              "nutritional": "0"
-            }
+            email: email
           });
           
           setLoggedIn(true);

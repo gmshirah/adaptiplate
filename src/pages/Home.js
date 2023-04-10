@@ -20,12 +20,12 @@ const recipes = [
     time: '30 min',
   },
   {
-    id: 0,
-    name: 'Orange Chicken',
-    img: 'https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg',
-    cost: '$8',
+    id: 2,
+    name: 'Chicken Alfredo',
+    img: 'https://hips.hearstapps.com/hmg-prod/images/delish-221130-perfect-chicken-alfredo-0683-eb-1670449995.jpg?crop=1xw:0.8277591973244147xh;center,top',
+    cost: '$12',
     health: 'Moderate',
-    time: '30 min',
+    time: '40 min',
   },
 ];
 
@@ -35,8 +35,8 @@ const RecipeCard = ({ recipe, path }) => {
 
   return (
     <Col md={6}>
-      <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
-        <Card id="recipeCard">
+      <Link to="/recipe" onClick={handleClick}>
+        <Card>
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
             <h4 id="recipeTitle">{recipe.name}</h4>
@@ -56,7 +56,7 @@ function Home() {
   return (
     <Container>
       <h1 id="titleText">Welcome!</h1>
-      <h3 id="headingText">Paste a recipe link below</h3>
+      <h3>Paste a recipe link below</h3>
       <Form>
         <InputGroup>
           <Form.Control type="text" />
@@ -70,8 +70,8 @@ function Home() {
           </Button>
         </InputGroup>
       </Form>
-      <h3 id="headingText">Recently Viewed</h3>
-      <div>
+      <h3>Recently Viewed</h3>
+      <div id="scrollableContent">
         <Row>
           {recipes.map((recipe) => (
             <RecipeCard key={recipe.id} recipe={recipe} />

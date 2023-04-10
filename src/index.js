@@ -44,7 +44,7 @@ root.render(
     <HashRouter basename='/'>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/recipe/:id" element={<Recipe />} />
+        <Route path="/recipe" element={<Recipe />} />
         <Route path="/saved" element={<Saved />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/login" element={<Login />} />

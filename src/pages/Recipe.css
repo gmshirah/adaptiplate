@@ -1,11 +1,10 @@
 div.container {
     text-align: center;
     padding-top: 2rem;
-    padding-bottom: 6rem;
+    padding-bottom: 2rem;
 }
 
-#ingredientsHeading {
-    padding-top: 0rem;
+h1, h3 {
     padding-bottom: 1rem;
 }
 
@@ -93,8 +92,6 @@ div.container {
     justify-content: space-between;
     align-items: center;
     font-size: 18px;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
 }
 
 #subName {
@@ -148,9 +145,12 @@ form {
     padding-bottom: 2rem;
 }
 
-#recipeTitleText {
+#titleText {
     color: #29CC7A;
-    padding-bottom: 1rem;
+}
+
+#scrollableContent {
+    padding-bottom: 4rem;
 }
 
 .accordion {

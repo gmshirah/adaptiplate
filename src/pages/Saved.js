@@ -31,8 +31,8 @@ const RecipeCard = ( { recipe, path } ) =>
 
   return (
     <Col md={6}>
-      <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
-        <Card id="recipeCard">
+      <Link to="/recipe" onClick={handleClick}>
+        <Card>
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
             <h4 id="recipeTitle">{recipe.name}</h4>
@@ -52,65 +52,47 @@ function Saved ()
 {
   // Initialize Firebase Authentication and get a reference to the service
   const auth = getAuth( app );
-  // const user = auth.currentUser;
-
-  const [loggedIn, setLoggedIn] = useState(false);
+  const user = auth.currentUser;
 
   const [userData, setUserData] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
 
   useEffect( () =>
   {
-    onAuthStateChanged(auth, (currentUser) => {
-      setSavedRecipes([]);
-      if (currentUser) {
-        const dbRef = ref(getDatabase());
-        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
-          if (snapshot.exists()) {
-            setUserData(snapshot.val());
-          }
-        }).catch((error) => {
-          console.error(error);
-          alert("Error retrieving user data.");
-        });
-
-        getSavedRecipes();
-      }
-      setLoggedIn(currentUser != null);
-    });
-  }, [] );
-
-  function getSavedRecipes() {
-    const dbRef = ref(getDatabase());
-    const db = getDatabase();
-    const dbSavedRecipesRef = ref(db, `users/${auth.currentUser.uid}/recipes`);
-    onValue(dbSavedRecipesRef, (snapshot) => {
-      let recipeIds = [];
-      snapshot.forEach((recipeIdSnapshot) => {
-        const recipeId = recipeIdSnapshot.val();
-        recipeIds.push(recipeId);
+    if ( user )
+    {
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `users/${user.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          setUserData(snapshot.val());
+        }
+      }).catch((error) => {
+        console.error(error);
+        alert("Error retrieving user data.");
       });
-      recipeIds.forEach((id) => {
-        get(child(dbRef, `recipes/${id.id}`)).then((recipeSnapshot) => {
-          if (recipeSnapshot.exists()) {
-            setSavedRecipes(oldArray => [...oldArray, recipeSnapshot.val()]);
-          }
-        }).catch((error) => {
-          console.error(error);
-          alert("Error retrieving recipe data.");
+
+      const db = getDatabase();
+      const dbSavedRecipesRef = ref(db, `users/${user.uid}/recipes`);
+      onValue(dbSavedRecipesRef, (snapshot) => {
+        let arr = [];
+        snapshot.forEach((recipeSnapshot) => {
+          const recipeData = recipeSnapshot.val();
+          arr.push(recipeData);
         });
+        arr.reverse();
+        setSavedRecipes(arr);
+      }, {
+        onlyOnce: false
       });
-    }, {
-      onlyOnce: false
-    });
-  }
+    }
+  }, [user] );
 
   return (
     <Container>
-      {loggedIn ? (
+      {user ? (
         <div>
           <h1 id="titleText">Saved Recipes</h1>
-          <div>
+          <div id="scrollableContent">
             <Row>
               {savedRecipes.map( ( recipe ) => (
                 <RecipeCard recipe={recipe} />
@@ -121,12 +103,13 @@ function Saved ()
       ) : (
         <div>
           <Link to="/login">
-            <button id="loginButton">Login</button>
+            <button class="loginButton">Login</button>
           </Link>
         </div>
       )}
     </Container>
   );
+
 }
 
 export default Saved;
