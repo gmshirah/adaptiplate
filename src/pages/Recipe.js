@@ -225,6 +225,27 @@ function Recipe() {
       {/* FOOD IMAGE  */}
       <Image id="recipeImage" src={recipeData.image} />
 
+      <div id="dietTags">
+        {recipeData.dairyFree ? (
+          <span id="tag">Dairy Free</span>
+        ) : (<span />)}
+        {recipeData.glutenFree ? (
+          <span id="tag">Gluten Free</span>
+        ) : (<span />)}
+        {recipeData.lowFodmap ? (
+          <span id="tag">Low FODMAP</span>
+        ) : (<span />)}
+        {recipeData.sustainable ? (
+          <span id="tag">Sustainable</span>
+        ) : (<span />)}
+        {recipeData.vegan ? (
+          <span id="tag">Vegan</span>
+        ) : (<span />)}
+        {recipeData.vegetarian ? (
+          <span id="tag">Vegetarian</span>
+        ) : (<span />)}
+      </div>
+
       <div id="recipeInfo">
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
@@ -244,6 +265,11 @@ function Recipe() {
           </div>
           <p id="statText">{recipeData.readyInMinutes} mins</p>
         </div>
+      </div>
+
+      <div id="servingsInfo">
+        <span>Servings:</span>
+        <span>{recipeData.servings}</span>
       </div>
 
       <Tabs
