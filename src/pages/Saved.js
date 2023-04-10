@@ -33,13 +33,13 @@ const RecipeCard = ( { recipe, path } ) =>
     <Col md={6}>
       <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
         <Card id="recipeCard">
-          <Card.Img variant="top" src={recipe.img} />
+          <Card.Img variant="top" src={recipe.image} />
           <Card.ImgOverlay>
-            <h4 id="recipeTitle">{recipe.name}</h4>
+            <h4 id="recipeTitle">{recipe.title}</h4>
             <div id="recipeStats">
-              <Card.Text>{recipe.price}</Card.Text>
-              <Card.Text>{recipe.health}</Card.Text>
-              <Card.Text>{recipe.time}</Card.Text>
+              <Card.Text>${(recipe.pricePerServing / 100).toFixed(2)}</Card.Text>
+              <Card.Text>{recipe.healthScore}</Card.Text>
+              <Card.Text>{recipe.readyInMinutes} mins</Card.Text>
             </div>
           </Card.ImgOverlay>
         </Card>

@@ -94,13 +94,13 @@ function Home ()
         </InputGroup>
       </Form>
       <h3 id="headingText">Recently Viewed</h3>
-      <div>
+      {/* <div>
         <Row>
           {recipes.map( ( recipe ) => (
             <RecipeCard key={recipe.id} recipe={recipe} />
           ) )}
         </Row>
-      </div>
+      </div> */}
     </Container>
   );
 }

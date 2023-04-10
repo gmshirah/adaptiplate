@@ -11,6 +11,8 @@ import {
   Row,
   Col,
   Image,
+  Tabs,
+  Tab
 } from 'react-bootstrap';
 import { initializeApp } from "firebase/app";
 import { getAuth , onAuthStateChanged } from "firebase/auth";
@@ -46,18 +48,24 @@ const Ingredient = ({ ingredient }) => {
     <Accordion.Item eventKey={ingredient.id}>
       <Accordion.Header>
         <span id="ingredientName">{ingredient.name}</span>
-        <span id="ingredientAmount">{ingredient.amount}</span>
+        <span id="ingredientAmount">{ingredient.amount} {ingredient.measures.us.unitShort}</span>
       </Accordion.Header>
       <Accordion.Body>
-        {ingredient.subs && ingredient.subs.map(sub =>
-          <Container id="sub">
-            <div>
-              <p id="subName">{sub.name}</p>
-              <p id="subEffect">{sub.effect}</p>
-            </div>
-            <span className="material-symbols-outlined" id="infoIcon">
-              info
-            </span>
+        {ingredient.substitutions ? (
+          ingredient.subs && ingredient.subs.map(sub =>
+            <Container id="sub">
+              <div>
+                <p id="subName">{sub.name}</p>
+                <p id="subEffect">{sub.effect}</p>
+              </div>
+              <span className="material-symbols-outlined" id="infoIcon">
+                info
+              </span>
+            </Container>
+          )
+        ) : (
+          <Container id="noSub">
+            <p id="noSubText">No substitutions available!</p>
           </Container>
         )}
       </Accordion.Body>
@@ -79,13 +87,29 @@ function Recipe() {
   const [userData, setUserData] = useState([]);
   const [recipeData, setRecipeData] = useState([]);
   const [ingredientData, setIngredientData] = useState([]);
+  const [instructionData, setInstructionData] = useState([]);
 
   useEffect(() => {
     const dbRef = ref(getDatabase());
     get(child(dbRef, `recipes/${params.id}`)).then((snapshot) => {
       if (snapshot.exists()) {
         setRecipeData(snapshot.val());
-        setIngredientData(snapshot.val().ingredients);
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+
+    get(child(dbRef, `recipes/${params.id}/extendedIngredients`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        setIngredientData(snapshot.val());
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
+
+    get(child(dbRef, `recipes/${params.id}/analyzedInstructions/0/steps`)).then((snapshot) => {
+      if (snapshot.exists()) {
+        setInstructionData(snapshot.val());
       }
     }).catch((error) => {
       console.error(error);
@@ -195,41 +219,62 @@ function Recipe() {
         </InputGroup>
       </Form>
 
-      <h1 id="recipeTitleText">{recipeData.name}</h1>
+      <h1 id="recipeTitleText">{recipeData.title}</h1>
+      <p id="recipeSourceText"><i>{recipeData.sourceName}</i></p>
 
       {/* FOOD IMAGE  */}
-      <Image id="recipeImage" src={recipeData.img} />
+      <Image id="recipeImage" src={recipeData.image} />
 
       <div id="recipeInfo">
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             payments
           </div>
-          <p id="statText">{recipeData.price}</p>
+          <p id="statText">${(recipeData.pricePerServing / 100).toFixed(2)}</p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             favorite
           </div>
-          <p id="statText">{recipeData.health}</p>
+          <p id="statText">{recipeData.healthScore}</p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             schedule
           </div>
-          <p id="statText">{recipeData.time}</p>
+          <p id="statText">{recipeData.readyInMinutes} mins</p>
         </div>
       </div>
 
-      <h3 id="ingredientsHeading">Ingredients</h3>
+      <Tabs
+        defaultActiveKey="ingredients"
+        id="ingredientsInstructionsTab"
+        justify
+      >
+        <Tab eventKey="ingredients" title="Ingredients">
+          {ingredientData.map(ingredient =>
+            <Accordion>
+              <Ingredient key={ingredient.id} ingredient={ingredient} />
+            </Accordion>
+          )}
+        </Tab>
+        <Tab eventKey="instructions" title="Instructions">
+            <ol>
+              {instructionData.map(instruction =>
+                <li id="instruction">
+                  {instruction.step}
+                </li>
+              )}
+            </ol>
+        </Tab>
+      </Tabs>
 
-      <div>
-        {ingredientData.map(ingredient =>
-          <Accordion>
-            <Ingredient key={ingredient.id} ingredient={ingredient} />
-          </Accordion>
-        )}
-      </div>
+      <a id="visitSourceLink" target="_blank" href={recipeData.sourceUrl}>
+        <span id="visitRecipeSource">Visit recipe source</span>
+        <span id="openLinkIcon" class="material-symbols-outlined">
+          open_in_new
+        </span>
+      </a>
     </Container>
   );
 }
