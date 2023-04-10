@@ -1,23 +1,16 @@
 div.container {
     text-align: center;
     padding-top: 2rem;
-    padding-bottom: 2rem;
-}
-
-h1 {
-    padding-bottom: 1rem;
+    padding-bottom: 6rem;
 }
 
 #titleText {
     color: #29CC7A;
 }
 
-#scrollableContent {
-    padding-bottom: 4rem;
-}
-
-.card {
-    margin-bottom: 2rem;
+#recipeCard {
+    margin-top: 2rem;
+    margin-bottom: 0rem;
     border: 0;
 }
 
@@ -57,7 +50,7 @@ h1 {
     width: 50%;
 }
 
-.loginButton {
+#loginButton {
     background-color: #29CC7A;
     border-radius: 30px;
     border: none;
