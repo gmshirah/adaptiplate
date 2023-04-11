@@ -48,7 +48,7 @@ const Ingredient = ({ ingredient }) => {
     <Accordion.Item eventKey={ingredient.id}>
       <Accordion.Header>
         <span id="ingredientName">{ingredient.name}</span>
-        <span id="ingredientAmount">{ingredient.amount} {ingredient.measures.us.unitShort}</span>
+        <span id="ingredientAmount">{ingredient.amount % 1 == 0 ? ingredient.amount : (ingredient.amount).toFixed(2)} {ingredient.measures.us.unitShort}</span>
       </Accordion.Header>
       <Accordion.Body>
         {ingredient.substitutions ? (
