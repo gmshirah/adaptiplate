@@ -22,9 +22,12 @@ function parseId(source, title) {
 
 const RecipeCard = ({ recipe }) => {
   const navigate = useNavigate();
-  
+
+  const [loading, setLoading] = useState(false);
+
   const onRecipeCardClick = (e) => {
     e.preventDefault();
+    setLoading(true);
     axios.get(`${api}/recipes/${recipe.id}/information`, {
       params: {
         includeNutrition: true,
@@ -40,13 +43,16 @@ const RecipeCard = ({ recipe }) => {
         const newRecipeRef = child(dbRef, `recipes/${newId}`);
         response.data.id = newId;
         set(newRecipeRef, response.data).then(() => {
+          setLoading(false);
           navigate(`/recipe/${newId}`);
         }).catch((error) => {
+          setLoading(false);
           alert("Error retrieving recipe. Please try again!");
           console.error(error);
         });
       })
       .catch((error) => {
+        setLoading(false);
         alert("Error retrieving recipe. Please try again!");
         console.error(error);
       })
@@ -57,6 +63,12 @@ const RecipeCard = ({ recipe }) => {
 
   return (
     <Col md={6}>
+      {loading ? (
+        <div id="loadingScreen">
+          <Spinner id="loadingSpinner" variant="light" animation="border" />
+        </div>
+      ) : (<span />)}
+
       <Card id="recipeCard" onClick={onRecipeCardClick}>
         <Card.Img variant="top" src={recipe.image} />
         <Card.ImgOverlay>
@@ -70,28 +82,15 @@ const RecipeCard = ({ recipe }) => {
 function Search() {
   const location = useLocation();
   const recipes = location.state.recipes;
-  console.log(recipes);
-
-  const [loading, setLoading] = useState(false);
 
   return (
     <Container>
-      {loading ? (
-        <div id="loadingScreen">
-          <Spinner id="loadingSpinner" variant="light" animation="border" />
-        </div>
-      ) : (<span />)}
-
-      <div>
-        <h1 id="titleText">Search Results</h1>
-        <div>
-          <Row>
-            {recipes.results.map((recipe) => (
-              <RecipeCard recipe={recipe} />
-            ))}
-          </Row>
-        </div>
-      </div>
+      <h1 id="titleText">Search Results</h1>
+      <Row>
+        {recipes.results.map((recipe) => (
+          <RecipeCard recipe={recipe} />
+        ))}
+      </Row>
     </Container>
   );
 }

@@ -116,6 +116,7 @@ function Home() {
       axios.get(`${api}/recipes/complexSearch`, {
         params: {
           query: input,
+          sort: "popularity",
         },
         headers: {
           'X-RapidAPI-Key': apiKey,
