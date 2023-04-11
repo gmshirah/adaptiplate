@@ -49,3 +49,20 @@ div.container {
     flex-direction: column;
     width: 50%;
 }
+
+#loadingScreen {
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    overflow-x: hidden;
+    transition: 0.5s;
+}
+
+#loadingSpinner {
+    position: relative;
+    top: 40%;
+}
