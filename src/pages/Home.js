@@ -67,11 +67,9 @@ function Home ()
     const regex = /^(http|https):\/\/([\w\d]+\.)+[\w\d]{2,}(\/.*)?$/;
     if ( regex.test( input ) )
     {
-      console.log( 'recipe' );
       navigate( '/recipe' );
     } else
     {
-      console.log( 'search' );
       try
       {
         const apiKey = '4e44682c76b3497d87414d53291ba8a6';
