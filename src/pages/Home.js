@@ -1,4 +1,6 @@
 import './Home.css';
+import { app, api, apiKey } from '../index.js';
+import axios from 'axios';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import
@@ -9,8 +11,16 @@ import
   Form,
   InputGroup,
   Row,
-  Card
+  Card,
+  Spinner
 } from 'react-bootstrap';
+import
+  {
+    getDatabase,
+    ref,
+    set,
+    child,
+  } from "firebase/database";
 
 const recipes = [
   {
@@ -56,28 +66,72 @@ const RecipeCard = ( { recipe, path } ) =>
   );
 };
 
+function parseId(source, title) {
+  return source.replace(/ /g, "-").toLowerCase().split(".")[0] + "-" + title.replace(/ /g, "-").toLowerCase();
+}
+
 function Home ()
 {
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
   const handleNewSearch = async ( event ) =>
   {
     event.preventDefault();
+    setLoading(true);
     const input = document.querySelector( 'input[name="searchInput"]' ).value;
     const regex = /^(http|https):\/\/([\w\d]+\.)+[\w\d]{2,}(\/.*)?$/;
     if ( regex.test( input ) )
     {
       console.log( 'recipe' );
-      navigate( '/recipe' );
+
+      axios.get(`${api}/recipes/extract`, {
+        params: {
+          apiKey: apiKey,
+          url: input,
+          analyze: true,
+          includeNutrition: true,
+        }
+      })
+      .then((response) => {
+        const dbRef = ref(getDatabase());
+        const newId = parseId(response.data.sourceName, response.data.title);
+        const newRecipeRef = child(dbRef, `recipes/${newId}`);
+        response.data.id = newId;
+        set(newRecipeRef, response.data).then(() => {
+          setLoading(false);
+          navigate(`/recipe/${newId}`);
+        }).catch((error) => {
+          setLoading(false);
+          alert("Error retrieving recipe. Please try again!");
+          console.error(error);
+        });
+      })
+      .catch((error) => {
+        setLoading(false);
+        alert("Error retrieving recipe. Please try again!");
+        console.error(error);
+      })
+      .then(() => {
+          
+      });
     } else
     {
       console.log( 'search' );
+      setLoading(false);
       navigate( '/search' );
     }
   };
 
   return (
     <Container>
+      {loading ? (
+        <div id="loadingScreen">
+          <Spinner id="loadingSpinner" variant="light" animation="border" />
+        </div>
+      ) : (<span />)}
+
       <h1 id="titleText">Welcome!</h1>
       <h3 id="headingText">Paste a recipe link below</h3>
       <Form>

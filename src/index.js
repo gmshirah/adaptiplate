@@ -35,6 +35,9 @@ const firebaseConfig = {
 const app = initializeApp( firebaseConfig );
 const analytics = getAnalytics( app );
 
+const api = "https://api.spoonacular.com/";
+const apiKey = "7f23a7a879434529853a89d9694281aa";
+
 const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
 root.render(
   <>
@@ -66,4 +69,4 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-export { app };
+export { app, api, apiKey };
