@@ -72,7 +72,22 @@ function Home ()
     } else
     {
       console.log( 'search' );
-      navigate( '/search' );
+      try
+      {
+        const apiKey = '4e44682c76b3497d87414d53291ba8a6';
+        const response = await fetch( `https://api.spoonacular.com/recipes/complexSearch?apiKey=${ apiKey }&query=${ input }` );
+        if ( response.ok )
+        {
+          const data = await response.json();
+          navigate( '/search', { state: { recipes: data } } );
+        } else
+        {
+          throw new Error( 'API request failed' );
+        }
+      } catch ( error )
+      {
+        console.error( 'Error fetching data', error );
+      }
     }
   };
 
