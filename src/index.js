@@ -21,7 +21,7 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBlPgsYfKfSl15rkPbRzdX_7pjf3N5i424",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: "adaptipla.firebaseapp.com",
   databaseURL: "https://adaptipla-default-rtdb.firebaseio.com",
   projectId: "adaptipla",
@@ -36,7 +36,7 @@ const app = initializeApp( firebaseConfig );
 const analytics = getAnalytics( app );
 
 const api = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
-const apiKey = "7080851dfemsh51854101744a0eep1dfa39jsn9c01470496aa";
+const apiKey = process.env.REACT_APP_API_KEY;
 const apiHost = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
 
 const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
