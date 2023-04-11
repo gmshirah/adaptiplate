@@ -67,7 +67,22 @@ function Home ()
     const regex = /^(http|https):\/\/([\w\d]+\.)+[\w\d]{2,}(\/.*)?$/;
     if ( regex.test( input ) )
     {
-      navigate( '/recipe' );
+      try
+      {
+        const apiKey = '4e44682c76b3497d87414d53291ba8a6';
+        const response = await fetch( `https://api.spoonacular.com/recipes/extract?apiKey=${ apiKey }&url=${ input }` );
+        if ( response.ok )
+        {
+          const data = await response.json();
+          navigate( '/recipe', { state: { recipes: data } } );
+        } else
+        {
+          throw new Error( 'API request failed' );
+        }
+      } catch ( error )
+      {
+        console.error( 'Error fetching data', error );
+      }
     } else
     {
       try
