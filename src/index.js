@@ -35,8 +35,9 @@ const firebaseConfig = {
 const app = initializeApp( firebaseConfig );
 const analytics = getAnalytics( app );
 
-const api = "https://api.spoonacular.com/";
-const apiKey = "7f23a7a879434529853a89d9694281aa";
+const api = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
+const apiKey = "7080851dfemsh51854101744a0eep1dfa39jsn9c01470496aa";
+const apiHost = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
 
 const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
 root.render(
@@ -69,4 +70,4 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-export { app, api, apiKey };
+export { app, api, apiKey, apiHost };

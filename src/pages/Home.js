@@ -1,25 +1,23 @@
 import './Home.css';
-import { app, api, apiKey } from '../index.js';
+import { app, api, apiKey, apiHost } from '../index.js';
 import axios from 'axios';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import
-{
-  Button,
-  Col,
-  Container,
-  Form,
-  InputGroup,
-  Row,
-  Card,
-  Spinner
+import {
+Button,
+Col,
+Container,
+Form,
+InputGroup,
+Row,
+Card,
+Spinner
 } from 'react-bootstrap';
-import
-{
-  getDatabase,
-  ref,
-  set,
-  child,
+import {
+getDatabase,
+ref,
+set,
+child,
 } from "firebase/database";
 
 const recipes = [
@@ -41,15 +39,13 @@ const recipes = [
   },
 ];
 
-const RecipeCard = ( { recipe, path } ) =>
-{
-  const handleClick = ( event ) =>
-  {
+const RecipeCard = ({ recipe, path }) => {
+  const handleClick = (event) => {
   };
 
   return (
     <Col md={6}>
-      <Link to={`/recipe/${ recipe.id }`} onClick={handleClick}>
+      <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
         <Card id="recipeCard">
           <Card.Img variant="top" src={recipe.img} />
           <Card.ImgOverlay>
@@ -66,80 +62,78 @@ const RecipeCard = ( { recipe, path } ) =>
   );
 };
 
-function parseId ( source, title )
-{
-  return source.replace( / /g, "-" ).toLowerCase().split( "." )[ 0 ] + "-" + title.replace( / /g, "-" ).toLowerCase();
+function parseId(source, title) {
+  return source.replace(/ /g, "-").toLowerCase().split(".")[0] + "-" + title.replace(/ /g, "-").toLowerCase();
 }
 
-function Home ()
-{
+function Home() {
   const navigate = useNavigate();
 
-  const [ loading, setLoading ] = useState( false );
+  const [loading, setLoading] = useState(false);
 
-  const handleNewSearch = async ( event ) =>
-  {
+  const handleNewSearch = async (event) => {
     event.preventDefault();
-    setLoading( true );
-    const input = document.querySelector( 'input[name="searchInput"]' ).value;
+    setLoading(true);
+    const input = document.querySelector('input[name="searchInput"]').value;
     const regex = /^(http|https):\/\/([\w\d]+\.)+[\w\d]{2,}(\/.*)?$/;
-    const apiKey = '4e44682c76b3497d87414d53291ba8a6';
-    if ( regex.test( input ) )
-    {
-      console.log( 'recipe' );
-
-      axios.get( `${ api }/recipes/extract`, {
+    if (regex.test(input)) {
+      // URL input
+      axios.get(`${api}/recipes/extract`, {
         params: {
-          apiKey: apiKey,
           url: input,
           analyze: true,
           includeNutrition: true,
+        },
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': apiHost
         }
-      } )
-        .then( ( response ) =>
-        {
-          const dbRef = ref( getDatabase() );
-          const newId = parseId( response.data.sourceName, response.data.title );
-          const newRecipeRef = child( dbRef, `recipes/${ newId }` );
+      })
+        .then((response) => {
+          const dbRef = ref(getDatabase());
+          const newId = parseId(response.data.sourceName, response.data.title);
+          const newRecipeRef = child(dbRef, `recipes/${newId}`);
           response.data.id = newId;
-          set( newRecipeRef, response.data ).then( () =>
-          {
-            setLoading( false );
-            navigate( `/recipe/${ newId }` );
-          } ).catch( ( error ) =>
-          {
-            setLoading( false );
-            alert( "Error retrieving recipe. Please try again!" );
-            console.error( error );
-          } );
-        } )
-        .catch( ( error ) =>
-        {
-          setLoading( false );
-          alert( "Error retrieving recipe. Please try again!" );
-          console.error( error );
-        } )
-        .then( () =>
-        {
+          set(newRecipeRef, response.data).then(() => {
+            setLoading(false);
+            navigate(`/recipe/${newId}`);
+          }).catch((error) => {
+            setLoading(false);
+            alert("Error retrieving recipe. Please try again!");
+            console.error(error);
+          });
+        })
+        .catch((error) => {
+          setLoading(false);
+          alert("Error retrieving recipe. Please try again!");
+          console.error(error);
+        })
+        .then(() => {
 
-        } );
-    } else
-    {
-      try
-      {
-        const response = await fetch( `https://api.spoonacular.com/recipes/complexSearch?apiKey=${ apiKey }&query=${ input }` );
-        if ( response.ok )
-        {
-          const data = await response.json();
-          navigate( '/search', { state: { recipes: data } } );
-        } else
-        {
-          throw new Error( 'API request failed' );
+        });
+    } else {
+      // Search input
+      axios.get(`${api}/recipes/complexSearch`, {
+        params: {
+          query: input,
+        },
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': apiHost
         }
-      } catch ( error )
-      {
-        console.error( 'Error fetching data', error );
-      }
+      })
+        .then((response) => {
+          setLoading(false);
+          navigate('/search', {state: {recipes: response.data}});
+        })
+        .catch((error) => {
+          setLoading(false);
+          alert("Error retrieving recipes. Please try again!");
+          console.error(error);
+        })
+        .then(() => {
+
+        });
     }
   };
 
@@ -149,7 +143,7 @@ function Home ()
         <div id="loadingScreen">
           <Spinner id="loadingSpinner" variant="light" animation="border" />
         </div>
-      ) : ( <span /> )}
+      ) : (<span />)}
 
       <h1 id="titleText">Welcome!</h1>
       <h3 id="headingText">Paste a recipe link below</h3>
