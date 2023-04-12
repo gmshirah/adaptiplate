@@ -7,7 +7,9 @@ import
   Container,
   Row,
   Col,
-  Card
+  Card,
+  Image,
+  Button
 } from 'react-bootstrap';
 import
 {
@@ -48,6 +50,72 @@ const RecipeCard = ( { recipe, path } ) =>
   );
 };
 
+const RecipeCardAlt = ( { recipe, path } ) =>
+{
+  const handleClick = ( event ) =>
+  {
+  };
+
+  return (
+    <Col md={6}>
+      <Link to={`/recipe/${recipe.id}`} id="recipeCardLinkAlt" onClick={handleClick}>
+        <div id="recipeCardAlt">
+          <div id="recipeCardHeaderAlt">
+            <Image thumbnail id="recipeImageAlt" src={recipe.image} />
+            <div id="recipeTitleDivAlt">
+              <h4 id="recipeTitleAlt">{recipe.title}</h4>
+              <div id="dietTags">
+                {recipe.dairyFree ? (
+                  <span id="tag">Dairy Free</span>
+                ) : (<span />)}
+                {recipe.glutenFree ? (
+                  <span id="tag">Gluten Free</span>
+                ) : (<span />)}
+                {recipe.lowFodmap ? (
+                  <span id="tag">Low FODMAP</span>
+                ) : (<span />)}
+                {recipe.sustainable ? (
+                  <span id="tag">Sustainable</span>
+                ) : (<span />)}
+                {recipe.vegan ? (
+                  <span id="tag">Vegan</span>
+                ) : (<span />)}
+                {recipe.vegetarian ? (
+                  <span id="tag">Vegetarian</span>
+                ) : (<span />)}
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div id="recipeCardBodyAlt">
+            <div id="stat">
+              <div className="material-symbols-outlined" id="statIcon">
+                payments
+              </div>
+              <p id="statText">${(recipe.pricePerServing / 100).toFixed(2)}</p>
+              <p id="statName"><i>per serving</i></p>
+            </div>
+            <div id="stat">
+              <div className="material-symbols-outlined" id="statIcon">
+                favorite
+              </div>
+              <p id="statText">{recipe.healthScore}</p>
+              <p id="statName"><i>health score</i></p>
+            </div>
+            <div id="stat">
+              <div className="material-symbols-outlined" id="statIcon">
+                schedule
+              </div>
+              <p id="statText">{recipe.readyInMinutes}</p>
+              <p id="statName"><i>minutes</i></p>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </Col>
+  );
+};
+
 function Saved ()
 {
   // Initialize Firebase Authentication and get a reference to the service
@@ -58,6 +126,8 @@ function Saved ()
 
   const [userData, setUserData] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
+
+  const [cardLayout, setCardLayout] = useState(false);
 
   useEffect( () =>
   {
@@ -105,6 +175,10 @@ function Saved ()
     });
   }
 
+  const switchCardLayout = (event) => {
+    setCardLayout(!cardLayout);
+  };
+
   return (
     <Container>
       {loggedIn ? (
@@ -112,11 +186,18 @@ function Saved ()
           <h1 id="titleText">Saved Recipes</h1>
           <div>
             <Row>
-              {savedRecipes.map( ( recipe ) => (
-                <RecipeCard recipe={recipe} />
-              ) )}
+              {cardLayout ? (
+                savedRecipes.map( ( recipe ) => (
+                  <RecipeCardAlt recipe={recipe} />
+                ) )
+              ) : (
+                savedRecipes.map( ( recipe ) => (
+                  <RecipeCard recipe={recipe} />
+                ) )
+              )}
             </Row>
           </div>
+          <Button variant="secondary" id="switchCardLayoutBtn" onClick={switchCardLayout}>Switch Card Layout</Button>
         </div>
       ) : (
         <div>
