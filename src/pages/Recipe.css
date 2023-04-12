@@ -9,13 +9,6 @@ div.container {
     padding-bottom: 1rem;
 }
 
-#statIcon {
-    width: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 #recipeImage {
     width: 100%;
     height: 300px;
@@ -72,6 +65,10 @@ div.container {
 
 #statIcon {
     font-size: 42px;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #statText {

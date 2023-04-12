@@ -78,7 +78,7 @@ div.container {
 
 /* Alternative Recipe Card Styling */
 
-#dietTags {
+#cardDietTags {
     padding: 0;
     margin: 0;
     flex-wrap: wrap;
@@ -86,7 +86,7 @@ div.container {
     justify-content: center;
 }
 
-#tag {
+#cardTag {
     background-color: #CCFFE6;
     padding-top: 0.25rem;
     padding-bottom: 0.25rem;
@@ -148,21 +148,7 @@ div.container {
     color: black;
 }
 
-#recipeStatsAlt {
-
-}
-
-#recipeStatAlt {
-    margin-bottom: 0rem;
-    color: black;
-    font-size: 18px;
-}
-
-#recipeStatsLabelAlt {
-    font-size: 14px;
-}
-
-#statIcon {
+#cardStatIcon {
     width: auto;
     display: flex;
     justify-content: center;
@@ -170,19 +156,19 @@ div.container {
     font-size: 28px;
 }
 
-#statText {
+#cardStatText {
     font-size: 18px;
     margin-bottom: 0;
 }
 
-#statName {
+#cardStatName {
     font-size: 14px;
     margin-bottom: 0;
     padding-left: 5px;
     padding-right: 5px;
 }
 
-#stat {
+#cardStat {
     width: 100px;
 }
 

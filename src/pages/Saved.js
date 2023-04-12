@@ -64,50 +64,50 @@ const RecipeCardAlt = ( { recipe, path } ) =>
             <Image thumbnail id="recipeImageAlt" src={recipe.image} />
             <div id="recipeTitleDivAlt">
               <h4 id="recipeTitleAlt">{recipe.title}</h4>
-              <div id="dietTags">
+              <div id="cardDietTags">
                 {recipe.dairyFree ? (
-                  <span id="tag">Dairy Free</span>
+                  <span id="cardTag">Dairy Free</span>
                 ) : (<span />)}
                 {recipe.glutenFree ? (
-                  <span id="tag">Gluten Free</span>
+                  <span id="cardTag">Gluten Free</span>
                 ) : (<span />)}
                 {recipe.lowFodmap ? (
-                  <span id="tag">Low FODMAP</span>
+                  <span id="cardTag">Low FODMAP</span>
                 ) : (<span />)}
                 {recipe.sustainable ? (
-                  <span id="tag">Sustainable</span>
+                  <span id="cardTag">Sustainable</span>
                 ) : (<span />)}
                 {recipe.vegan ? (
-                  <span id="tag">Vegan</span>
+                  <span id="cardTag">Vegan</span>
                 ) : (<span />)}
                 {recipe.vegetarian ? (
-                  <span id="tag">Vegetarian</span>
+                  <span id="cardTag">Vegetarian</span>
                 ) : (<span />)}
               </div>
             </div>
           </div>
           <hr />
           <div id="recipeCardBodyAlt">
-            <div id="stat">
-              <div className="material-symbols-outlined" id="statIcon">
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
                 payments
               </div>
-              <p id="statText">${(recipe.pricePerServing / 100).toFixed(2)}</p>
-              <p id="statName"><i>per serving</i></p>
+              <p id="cardStatText">${(recipe.pricePerServing / 100).toFixed(2)}</p>
+              <p id="cardStatName"><i>per serving</i></p>
             </div>
-            <div id="stat">
-              <div className="material-symbols-outlined" id="statIcon">
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
                 favorite
               </div>
-              <p id="statText">{recipe.healthScore}</p>
-              <p id="statName"><i>health score</i></p>
+              <p id="cardStatText">{recipe.healthScore}</p>
+              <p id="cardStatName"><i>health score</i></p>
             </div>
-            <div id="stat">
-              <div className="material-symbols-outlined" id="statIcon">
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
                 schedule
               </div>
-              <p id="statText">{recipe.readyInMinutes}</p>
-              <p id="statName"><i>minutes</i></p>
+              <p id="cardStatText">{recipe.readyInMinutes}</p>
+              <p id="cardStatName"><i>minutes</i></p>
             </div>
           </div>
         </div>
