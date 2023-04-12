@@ -37,9 +37,9 @@ const RecipeCard = ( { recipe, path } ) =>
           <Card.ImgOverlay>
             <h4 id="recipeTitle">{recipe.title}</h4>
             <div id="recipeStats">
-              <Card.Text>${(recipe.pricePerServing / 100).toFixed(2)}</Card.Text>
-              <Card.Text>{recipe.healthScore}</Card.Text>
-              <Card.Text>{recipe.readyInMinutes} mins</Card.Text>
+              <Card.Text><b>${(recipe.pricePerServing / 100).toFixed(2)}</b> <i id="recipeStatsLabel">per serving</i></Card.Text>
+              <Card.Text><b>{recipe.healthScore}</b> <i id="recipeStatsLabel">health score</i></Card.Text>
+              <Card.Text><b>{recipe.readyInMinutes}</b> <i id="recipeStatsLabel">minutes</i></Card.Text>
             </div>
           </Card.ImgOverlay>
         </Card>

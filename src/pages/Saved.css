@@ -47,7 +47,11 @@ div.container {
     justify-content: flex-end;
     align-items: flex-end;
     flex-direction: column;
-    width: 50%;
+    width: 100%;
+}
+
+#recipeStatsLabel {
+    font-size: 14px;
 }
 
 #loginButton {
