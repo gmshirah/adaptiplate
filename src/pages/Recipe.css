@@ -9,7 +9,7 @@ div.container {
     padding-bottom: 1rem;
 }
 
-#searchBtn, #statIcon {
+#statIcon {
     width: auto;
     display: flex;
     justify-content: center;
@@ -207,19 +207,15 @@ div.container {
     'opsz' 48
 }
 
-#backCol {
+#recipeHeader {
     display: flex;
-    justify-content: start;
+    justify-content: space-between;
+    align-items: start;
 }
 
-#saveCol {
-    display: flex;
-    justify-content: end;
-}
-
-form {
-    padding-top: 1rem;
-    padding-bottom: 2rem;
+#titleDiv {
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 #recipeTitleText {
