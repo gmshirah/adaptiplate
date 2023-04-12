@@ -146,11 +146,11 @@ div.container {
     padding-bottom: 1rem;
 }
 
-#subName {
-    font-weight: 700;
+#subTitle {
+    padding: 0rem;
 }
 
-#subName, #subEffect {
+#subDesc {
     margin-bottom: 0;
     text-align: start;
 }

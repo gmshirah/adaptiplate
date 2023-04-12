@@ -1,5 +1,6 @@
 import './Recipe.css';
-import { app } from '../index.js';
+import axios from 'axios';
+import { app, api, apiKey, apiHost } from '../index.js';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import {
@@ -44,25 +45,52 @@ import
 // };
 
 const Ingredient = ({ ingredient }) => {
+  const [subs, setSubs] = useState([]);
+
+  const onIngredientClick = (e) => {
+    e.preventDefault();
+    if (subs) {
+      axios.get(`${api}/food/ingredients/${ingredient.id}/substitutes`, {
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': apiHost
+        }
+      })
+      .then((response) => {
+        console.log(response.data);
+        setSubs(response.data.substitutes);
+      })
+      .catch((error) => {
+        alert("Error retrieving substitutions. Please try again!");
+        console.error(error);
+      })
+      .then(() => {
+
+      });
+    }
+  };
+
   return (
-    <Accordion.Item eventKey={ingredient.id}>
+    <Accordion.Item eventKey={ingredient.id} onClick={onIngredientClick}>
       <Accordion.Header>
         <span id="ingredientName">{ingredient.name}</span>
         <span id="ingredientAmount">{ingredient.amount % 1 == 0 ? ingredient.amount : (ingredient.amount).toFixed(2)} {ingredient.measures.us.unitShort}</span>
       </Accordion.Header>
       <Accordion.Body>
-        {ingredient.substitutions ? (
-          ingredient.subs && ingredient.subs.map(sub =>
+        {subs ? (
+          <div>
+          <h3 id="subTitle">Substitute Conversions</h3>
+          {subs.map(sub =>
             <Container id="sub">
               <div>
-                <p id="subName">{sub.name}</p>
-                <p id="subEffect">{sub.effect}</p>
+                <p id="subDesc">{sub}</p>
               </div>
               <span className="material-symbols-outlined" id="infoIcon">
                 info
               </span>
             </Container>
-          )
+          )}
+          </div>
         ) : (
           <Container id="noSub">
             <p id="noSubText">No substitutions available!</p>
