@@ -57,7 +57,6 @@ const Ingredient = ({ ingredient }) => {
         }
       })
       .then((response) => {
-        console.log(response.data);
         setSubs(response.data.substitutes);
       })
       .catch((error) => {
