@@ -13,7 +13,8 @@ import {
   Col,
   Image,
   Tabs,
-  Tab
+  Tab,
+  Spinner
 } from 'react-bootstrap';
 import { initializeApp } from "firebase/app";
 import { getAuth , onAuthStateChanged } from "firebase/auth";
@@ -46,9 +47,11 @@ import
 
 const Ingredient = ({ ingredient }) => {
   const [subs, setSubs] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const onIngredientClick = (e) => {
     e.preventDefault();
+    setLoading(true);
     if (subs) {
       axios.get(`${api}/food/ingredients/${ingredient.id}/substitutes`, {
         headers: {
@@ -58,8 +61,10 @@ const Ingredient = ({ ingredient }) => {
       })
       .then((response) => {
         setSubs(response.data.substitutes);
+        setLoading(false);
       })
       .catch((error) => {
+        setLoading(false);
         alert("Error retrieving substitutions. Please try again!");
         console.error(error);
       })
@@ -76,24 +81,30 @@ const Ingredient = ({ ingredient }) => {
         <span id="ingredientAmount">{ingredient.amount % 1 == 0 ? ingredient.amount : (ingredient.amount).toFixed(2)} {ingredient.measures.us.unitShort}</span>
       </Accordion.Header>
       <Accordion.Body>
-        {subs ? (
+        {loading ? (
           <div>
-          <h3 id="subTitle">Substitute Conversions</h3>
-          {subs.map(sub =>
-            <Container id="sub">
-              <div>
-                <p id="subDesc">{sub}</p>
-              </div>
-              <span className="material-symbols-outlined" id="infoIcon">
-                info
-              </span>
-            </Container>
-          )}
+            <Spinner animation="border" />
           </div>
         ) : (
-          <Container id="noSub">
-            <p id="noSubText">No substitutions available!</p>
-          </Container>
+          subs ? (
+            <div>
+              <h3 id="subTitle">Substitute Conversions</h3>
+              {subs.map(sub =>
+                <Container id="sub">
+                  <div>
+                    <p id="subDesc">{sub}</p>
+                  </div>
+                  <span className="material-symbols-outlined" id="infoIcon">
+                    info
+                  </span>
+                </Container>
+              )}
+            </div>
+          ) : (
+            <Container id="noSub">
+              <p id="noSubText">No substitutions available!</p>
+            </Container>
+          )
         )}
       </Accordion.Body>
     </Accordion.Item>
