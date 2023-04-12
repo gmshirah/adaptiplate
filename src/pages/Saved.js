@@ -138,6 +138,9 @@ function Saved ()
         get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
           if (snapshot.exists()) {
             setUserData(snapshot.val());
+            if (snapshot.val().cardLayout) {
+              setCardLayout(snapshot.val().cardLayout);
+            }
           }
         }).catch((error) => {
           console.error(error);
