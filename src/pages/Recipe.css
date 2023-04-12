@@ -65,7 +65,7 @@ div.container {
     padding-bottom: 0.5rem;
     border-radius: 10px;
     font-size: 18px;
-    background-color: #EEEEEE;
+    background-color: rgb(200, 200, 200);
     display: flex;
     justify-content: space-between;
 }
@@ -144,6 +144,9 @@ div.container {
     font-size: 18px;
     padding-top: 1rem;
     padding-bottom: 1rem;
+    margin-top: 1rem;
+    background-color: rgb(200, 200, 200);
+    border-radius: 15px;
 }
 
 #subTitle {

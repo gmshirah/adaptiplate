@@ -46,13 +46,13 @@ import
 // };
 
 const Ingredient = ({ ingredient }) => {
-  const [subs, setSubs] = useState([]);
+  const [subs, setSubs] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const onIngredientClick = (e) => {
     e.preventDefault();
-    setLoading(true);
-    if (subs) {
+    if (!subs) {
+      setLoading(true);
       axios.get(`${api}/food/ingredients/${ingredient.id}/substitutes`, {
         headers: {
           'X-RapidAPI-Key': apiKey,
@@ -60,7 +60,11 @@ const Ingredient = ({ ingredient }) => {
         }
       })
       .then((response) => {
-        setSubs(response.data.substitutes);
+        if (response.data.substitutes) {
+          setSubs(response.data.substitutes);
+        } else {
+          setSubs([]);
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -86,7 +90,7 @@ const Ingredient = ({ ingredient }) => {
             <Spinner animation="border" />
           </div>
         ) : (
-          subs ? (
+          subs && subs.length > 0 ? (
             <div>
               <h3 id="subTitle">Substitute Conversions</h3>
               {subs.map(sub =>
