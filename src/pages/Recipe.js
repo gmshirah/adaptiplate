@@ -294,18 +294,21 @@ function Recipe() {
             payments
           </div>
           <p id="statText">${(recipeData.pricePerServing / 100).toFixed(2)}</p>
+          <p id="statName"><i>per serving</i></p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             favorite
           </div>
           <p id="statText">{recipeData.healthScore}</p>
+          <p id="statName"><i>health score</i></p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             schedule
           </div>
-          <p id="statText">{recipeData.readyInMinutes} mins</p>
+          <p id="statText">{recipeData.readyInMinutes}</p>
+          <p id="statName"><i>minutes</i></p>
         </div>
       </div>
 
