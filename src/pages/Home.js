@@ -209,7 +209,6 @@ function Home ()
           {
             const tempHistory = recipeInfos.map( ( recipeInfo ) => recipeInfo.val() );
             setHistory( tempHistory );
-            setHistoryLoaded( true );
           } ).catch( ( error ) =>
           {
             console.error( error );
@@ -247,7 +246,7 @@ function Home ()
         </InputGroup>
       </Form>
       <h3 id="headingText">Recently Viewed</h3>
-      {historyLoaded && (
+      {
         <div>
           <Row>
             {searchHistory.map( ( recipe ) => (
@@ -255,7 +254,7 @@ function Home ()
             ) )}
           </Row>
         </div>
-      )}
+      }
     </Container>
   );
 }
