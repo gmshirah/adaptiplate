@@ -3,22 +3,29 @@ import { app, api, apiKey, apiHost } from '../index.js';
 import axios from 'axios';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import {
-Button,
-Col,
-Container,
-Form,
-InputGroup,
-Row,
-Card,
-Spinner
+import
+{
+  Button,
+  Col,
+  Container,
+  Form,
+  InputGroup,
+  Row,
+  Card,
+  Spinner
 } from 'react-bootstrap';
-import {
-getDatabase,
-ref,
-set,
-child,
+import
+{
+  getDatabase,
+  ref,
+  set,
+  child,
+  get
 } from "firebase/database";
+import
+{
+  getAuth, onAuthStateChanged,
+} from "firebase/auth";
 
 const recipes = [
   {
@@ -39,21 +46,23 @@ const recipes = [
   },
 ];
 
-const RecipeCard = ({ recipe, path }) => {
-  const handleClick = (event) => {
+const RecipeCard = ( { recipe, path } ) =>
+{
+  const handleClick = ( event ) =>
+  {
   };
 
   return (
     <Col md={6}>
-      <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
+      <Link to={`/recipe/${ recipe.id }`} onClick={handleClick}>
         <Card id="recipeCard">
-          <Card.Img variant="top" src={recipe.img} />
+          <Card.Img variant="top" src={recipe.image} />
           <Card.ImgOverlay>
-            <h4 id="recipeTitle">{recipe.name}</h4>
+            <h4 id="recipeTitle">{recipe.title}</h4>
             <div id="recipeStats">
-              <Card.Text>{recipe.cost}</Card.Text>
-              <Card.Text>{recipe.health}</Card.Text>
-              <Card.Text>{recipe.time}</Card.Text>
+              <Card.Text><b>${( recipe.pricePerServing / 100 ).toFixed( 2 )}</b> <i id="recipeStatsLabel">per serving</i></Card.Text>
+              <Card.Text><b>{recipe.healthScore}</b> <i id="recipeStatsLabel">health score</i></Card.Text>
+              <Card.Text><b>{recipe.readyInMinutes}</b> <i id="recipeStatsLabel">minutes</i></Card.Text>
             </div>
           </Card.ImgOverlay>
         </Card>
@@ -62,23 +71,33 @@ const RecipeCard = ({ recipe, path }) => {
   );
 };
 
-function parseId(source, title) {
-  return source.replace(/ /g, "-").toLowerCase().split(".")[0] + "-" + title.replace(/ /g, "-").toLowerCase();
+function parseId ( source, title )
+{
+  return source.replace( / /g, "-" ).toLowerCase().split( "." )[ 0 ] + "-" + title.replace( / /g, "-" ).toLowerCase();
 }
 
-function Home() {
+function Home ()
+{
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(false);
+  const [ loading, setLoading ] = useState( false );
 
-  const handleNewSearch = async (event) => {
+  const [ searchHistory, setHistory ] = useState( [] );
+
+  const [ historyLoaded, setHistoryLoaded ] = useState( false );
+
+
+
+  const handleNewSearch = async ( event ) =>
+  {
     event.preventDefault();
-    setLoading(true);
-    const input = document.querySelector('input[name="searchInput"]').value;
+    setLoading( true );
+    const input = document.querySelector( 'input[name="searchInput"]' ).value;
     const regex = /^(http|https):\/\/([\w\d]+\.)+[\w\d]{2,}(\/.*)?$/;
-    if (regex.test(input)) {
+    if ( regex.test( input ) )
+    {
       // URL input
-      axios.get(`${api}/recipes/extract`, {
+      axios.get( `${ api }/recipes/extract`, {
         params: {
           url: input,
           analyze: true,
@@ -88,32 +107,59 @@ function Home() {
           'X-RapidAPI-Key': apiKey,
           'X-RapidAPI-Host': apiHost
         }
-      })
-        .then((response) => {
-          const dbRef = ref(getDatabase());
-          const newId = parseId(response.data.sourceName, response.data.title);
-          const newRecipeRef = child(dbRef, `recipes/${newId}`);
+      } )
+        .then( ( response ) =>
+        {
+          const dbRef = ref( getDatabase() );
+          const newId = parseId( response.data.sourceName, response.data.title );
+          const newRecipeRef = child( dbRef, `recipes/${ newId }` );
           response.data.id = newId;
-          set(newRecipeRef, response.data).then(() => {
-            setLoading(false);
-            navigate(`/recipe/${newId}`);
-          }).catch((error) => {
-            setLoading(false);
-            alert("Error retrieving recipe. Please try again!");
-            console.error(error);
-          });
-        })
-        .catch((error) => {
-          setLoading(false);
-          alert("Error retrieving recipe. Please try again!");
-          console.error(error);
-        })
-        .then(() => {
 
-        });
-    } else {
+          const auth = getAuth( app );
+          if ( auth.currentUser )
+          {
+            const userRef = child( dbRef, `users/${ auth.currentUser.uid }` );
+            get( userRef ).then( ( snapshot ) =>
+            {
+              const userData = snapshot.val();
+              const recentlyViewed = userData.recentlyViewed || [];
+              if ( recentlyViewed[ 0 ] !== newId )
+              {
+                const newRecentlyViewed = [ newId, ...recentlyViewed ].slice( 0, 3 );
+                update( userRef, { recentlyViewed: newRecentlyViewed } );
+              }
+            } ).catch( ( error ) =>
+            {
+              alert( "Error updating user data. Please try again!" );
+              console.error( error );
+            } );
+          }
+
+          set( newRecipeRef, response.data ).then( () =>
+          {
+            setLoading( false );
+            navigate( `/recipe/${ newId }` );
+          } ).catch( ( error ) =>
+          {
+            setLoading( false );
+            alert( "Error retrieving recipe. Please try again!" );
+            console.error( error );
+          } );
+        } )
+        .catch( ( error ) =>
+        {
+          setLoading( false );
+          alert( "Error retrieving recipe. Please try again!" );
+          console.error( error );
+        } )
+        .then( () =>
+        {
+
+        } );
+    } else
+    {
       // Search input
-      axios.get(`${api}/recipes/complexSearch`, {
+      axios.get( `${ api }/recipes/complexSearch`, {
         params: {
           query: input,
           sort: "popularity",
@@ -122,21 +168,60 @@ function Home() {
           'X-RapidAPI-Key': apiKey,
           'X-RapidAPI-Host': apiHost
         }
-      })
-        .then((response) => {
-          setLoading(false);
-          navigate('/search', {state: {recipes: response.data}});
-        })
-        .catch((error) => {
-          setLoading(false);
-          alert("Error retrieving recipes. Please try again!");
-          console.error(error);
-        })
-        .then(() => {
+      } )
+        .then( ( response ) =>
+        {
+          setLoading( false );
+          navigate( '/search', { state: { recipes: response.data } } );
+        } )
+        .catch( ( error ) =>
+        {
+          setLoading( false );
+          alert( "Error retrieving recipes. Please try again!" );
+          console.error( error );
+        } )
+        .then( () =>
+        {
 
-        });
+        } );
     }
   };
+
+  useEffect( () =>
+  {
+    const auth = getAuth( app );
+    onAuthStateChanged( auth, ( currentUser ) =>
+    {
+      setHistory( [] );
+      if ( currentUser )
+      {
+        const dbRef = ref( getDatabase() );
+        const recentRecipesRef = child( dbRef, `users/${ currentUser.uid }/recentlyViewed` );
+        get( recentRecipesRef ).then( ( snapshot ) =>
+        {
+          const promises = [];
+          snapshot.forEach( ( childSnapshot ) =>
+          {
+            const recipeRef = child( dbRef, `recipes/${ childSnapshot.val() }` );
+            promises.push( get( recipeRef ) );
+          } );
+          Promise.all( promises ).then( ( recipeInfos ) =>
+          {
+            const tempHistory = recipeInfos.map( ( recipeInfo ) => recipeInfo.val() );
+            setHistory( tempHistory );
+            setHistoryLoaded( true );
+          } ).catch( ( error ) =>
+          {
+            console.error( error );
+          } );
+        } ).catch( ( error ) =>
+        {
+          console.error( error );
+        } );
+      }
+    } );
+  }, [] );
+
 
   return (
     <Container>
@@ -144,7 +229,7 @@ function Home() {
         <div id="loadingScreen">
           <Spinner id="loadingSpinner" variant="light" animation="border" />
         </div>
-      ) : (<span />)}
+      ) : ( <span /> )}
 
       <h1 id="titleText">Welcome!</h1>
       <h3 id="headingText">Paste a recipe link below</h3>
@@ -162,13 +247,15 @@ function Home() {
         </InputGroup>
       </Form>
       <h3 id="headingText">Recently Viewed</h3>
-      {/* <div>
-        <Row>
-          {recipes.map( ( recipe ) => (
-            <RecipeCard key={recipe.id} recipe={recipe} />
-          ) )}
-        </Row>
-      </div> */}
+      {historyLoaded && (
+        <div>
+          <Row>
+            {searchHistory.map( ( recipe ) => (
+              <RecipeCard key={recipe.id} recipe={recipe} />
+            ) )}
+          </Row>
+        </div>
+      )}
     </Container>
   );
 }
