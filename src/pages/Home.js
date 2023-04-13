@@ -20,7 +20,8 @@ import
   ref,
   set,
   child,
-  get
+  get,
+  update
 } from "firebase/database";
 import
 {
