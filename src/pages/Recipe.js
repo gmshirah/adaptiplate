@@ -17,17 +17,16 @@ import {
   Spinner
 } from 'react-bootstrap';
 import { initializeApp } from "firebase/app";
-import { getAuth , onAuthStateChanged } from "firebase/auth";
-import
-  {
-    getDatabase,
-    ref,
-    get,
-    set,
-    child,
-    remove,
-    push
-  } from "firebase/database";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {
+getDatabase,
+ref,
+get,
+set,
+child,
+remove,
+push
+} from "firebase/database";
 
 // const DBQuery = (path) => {
 //   console.log(path);
@@ -59,22 +58,22 @@ const Ingredient = ({ ingredient }) => {
           'X-RapidAPI-Host': apiHost
         }
       })
-      .then((response) => {
-        if (response.data.substitutes) {
-          setSubs(response.data.substitutes);
-        } else {
-          setSubs([]);
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        setLoading(false);
-        alert("Error retrieving substitutions. Please try again!");
-        console.error(error);
-      })
-      .then(() => {
+        .then((response) => {
+          if (response.data.substitutes) {
+            setSubs(response.data.substitutes);
+          } else {
+            setSubs([]);
+          }
+          setLoading(false);
+        })
+        .catch((error) => {
+          setLoading(false);
+          alert("Error retrieving substitutions. Please try again!");
+          console.error(error);
+        })
+        .then(() => {
 
-      });
+        });
     }
   };
 
@@ -117,7 +116,7 @@ const Ingredient = ({ ingredient }) => {
 
 function Recipe() {
   // Initialize Firebase Authentication and get a reference to the service
-  const auth = getAuth( app );
+  const auth = getAuth(app);
 
   let [saved, setSaved] = useState(false);
 
@@ -199,7 +198,7 @@ function Recipe() {
       } else {
         const newRecipeRef = child(dbRef, `users/${auth.currentUser.uid}/recipes/${recipeData.id}`);
         set(newRecipeRef, {
-            id: recipeData.id
+          id: recipeData.id
         });
         get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
           if (snapshot.exists()) {
@@ -220,13 +219,13 @@ function Recipe() {
   const StarSelector = () => {
     if (saved) {
       return (
-        <span  className="material-symbols-outlined" id="saveIconFilled">
+        <span className="material-symbols-outlined" id="saveIconFilled">
           star
         </span>
       );
     } else {
       return (
-        <span  className="material-symbols-outlined" id="saveIcon">
+        <span className="material-symbols-outlined" id="saveIcon">
           star
         </span>
       );
@@ -235,34 +234,22 @@ function Recipe() {
 
   return (
     <Container>
-      {/* BACK AND SAVE BUTTONS */}
-      <Row>
-        <Col id="backCol">
+      <div id="recipeHeader">
+        <div id="backDiv">
           <Button onClick={BackButtonClick} id="backBtn">
             <span className="material-symbols-outlined" id="backIcon">
               arrow_back
             </span>
           </Button>
-        </Col>
-        <Col id="saveCol">
+        </div>
+        <div id="titleDiv">
+          <h1 id="recipeTitleText">{recipeData.title}</h1>
+          <p id="recipeSourceText"><i>{recipeData.sourceName}</i></p>
+        </div>
+        <div id="saveDiv">
           <Button onClick={SaveButtonClick} id="saveBtn">{StarSelector()}</Button>
-        </Col>
-      </Row>
-
-      {/* SEARCH BAR */}
-      <Form>
-        <InputGroup>
-          <Form.Control type="text" />
-          <Button variant="outline-secondary" id="searchBtn" type="submit">
-            <span className="material-symbols-outlined">
-              search
-            </span>
-          </Button>
-        </InputGroup>
-      </Form>
-
-      <h1 id="recipeTitleText">{recipeData.title}</h1>
-      <p id="recipeSourceText"><i>{recipeData.sourceName}</i></p>
+        </div>
+      </div>
 
       {/* FOOD IMAGE  */}
       <Image id="recipeImage" src={recipeData.image} />
@@ -294,18 +281,21 @@ function Recipe() {
             payments
           </div>
           <p id="statText">${(recipeData.pricePerServing / 100).toFixed(2)}</p>
+          <p id="statName"><i>per serving</i></p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             favorite
           </div>
           <p id="statText">{recipeData.healthScore}</p>
+          <p id="statName"><i>health score</i></p>
         </div>
         <div id="stat">
           <div className="material-symbols-outlined" id="statIcon">
             schedule
           </div>
-          <p id="statText">{recipeData.readyInMinutes} mins</p>
+          <p id="statText">{recipeData.readyInMinutes}</p>
+          <p id="statName"><i>minutes</i></p>
         </div>
       </div>
 
@@ -327,13 +317,13 @@ function Recipe() {
           )}
         </Tab>
         <Tab eventKey="instructions" title="Instructions">
-            <ol>
-              {instructionData.map(instruction =>
-                <li id="instruction">
-                  {instruction.step}
-                </li>
-              )}
-            </ol>
+          <ol>
+            {instructionData.map(instruction =>
+              <li id="instruction">
+                {instruction.step}
+              </li>
+            )}
+          </ol>
         </Tab>
       </Tabs>
 
