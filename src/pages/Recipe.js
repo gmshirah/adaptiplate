@@ -28,21 +28,10 @@ remove,
 push
 } from "firebase/database";
 
-// const DBQuery = (path) => {
-//   console.log(path);
-//   get(child(dbRef, path)).then((snapshot) => {
-//     if (snapshot.exists && snapshot.val()) {
-//       console.log(snapshot.val())
-//       return snapshot.val();
-//     } else {
-//       console.error("Error: DB data could not be accessed");
-//       return -1;
-//     }
-//   }).catch((error) => {
-//     console.error("DB Query Error: " + error);
-//     return -1;
-//   })
-// };
+function parseSubResponse(response) {
+  response = response.split("=")[0].trim();
+  return response.split(" ");
+}
 
 const Ingredient = ({ ingredient }) => {
   const [subs, setSubs] = useState(null);
@@ -52,6 +41,7 @@ const Ingredient = ({ ingredient }) => {
     e.preventDefault();
     if (!subs) {
       setLoading(true);
+      setSubs([]);
       axios.get(`${api}/food/ingredients/${ingredient.id}/substitutes`, {
         headers: {
           'X-RapidAPI-Key': apiKey,
@@ -60,11 +50,53 @@ const Ingredient = ({ ingredient }) => {
       })
         .then((response) => {
           if (response.data.substitutes) {
-            setSubs(response.data.substitutes);
+            let arr = response.data.substitutes;
+            for (let i = 0; i < arr.length; i++) {
+              let parsedSub = parseSubResponse(arr[i]);
+              axios.get(`${api}/recipes/convert`, {
+                params: {
+                  'ingredientName': ingredient.name,
+                  'sourceAmount': ingredient.amount,
+                  'sourceUnit': ingredient.measures.us.unitShort,
+                  'targetUnit': parsedSub[1],
+                },
+                headers: {
+                  'X-RapidAPI-Key': apiKey,
+                  'X-RapidAPI-Host': apiHost
+                }
+              })
+              .then((response) => {
+                let subsStr = arr[i].split("=")[1].trim();
+                // subsStr = subsStr.split("+");
+                const re = /and|\+/g;
+                subsStr = subsStr.split(re);
+                let subsArr = [];
+                for (let j = 0; j < subsStr.length; j++) {
+                  let str = eval(subsStr[j].trim().split(" ")[0]) * response.data.targetAmount;
+                  str % 1 == 0 ? str = str : str = str.toFixed(2);
+                  str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length);
+                  subsArr.push(str.trim());
+                }
+                if (i == 0) {
+                  setSubs([subsArr]);
+                } else {
+                  setSubs(oldArray => [...oldArray, subsArr]);
+                }
+
+                if (i == arr.length - 1) {
+                  setLoading(false);
+                }
+              })
+              .catch((error) => {
+                setLoading(false);
+                alert("Error converting substitutions. Please try again!");
+                console.error(error);
+              });
+            }
           } else {
             setSubs([]);
+            setLoading(false);
           }
-          setLoading(false);
         })
         .catch((error) => {
           setLoading(false);
@@ -95,7 +127,13 @@ const Ingredient = ({ ingredient }) => {
               {subs.map(sub =>
                 <Container id="sub">
                   <div>
-                    <p id="subDesc">{sub}</p>
+                    {sub && sub.length > 0 ? (
+                      sub.map(subPart =>
+                        <p id="subDesc">{subPart}</p>
+                      )
+                    ) : (
+                      <span />
+                    )}
                   </div>
                   <span className="material-symbols-outlined" id="infoIcon">
                     info
