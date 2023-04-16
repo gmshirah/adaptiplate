@@ -66,17 +66,42 @@ const Ingredient = ({ ingredient }) => {
                 }
               })
               .then((response) => {
+                // arr[i] format example: 1 cup = 7/8 cup [ingredient] + 1 tsp [ingredient]
+
+                // response.data.targetAmount example:
+                //   sourceAmount: 8
+                //   sourceUnit: Tbsp
+                //   targetUnit: cup
+                //   targetAmount: 0.5
+                // we will use this to determine measurements for ingredient substitutes
+
+                // subsStr format example: 7/8 cup [ingredient] + 1 tsp [ingredient]
                 let subsStr = arr[i].split("=")[1].trim();
-                // subsStr = subsStr.split("+");
+                
+                // regex to split subsStr at "+" and "and" (API responses are inconsistent)
                 const re = /and|\+/g;
+
+                // subsStr format example: ["7/8 cup [ingredient]", "1 tsp [ingredient]"]
                 subsStr = subsStr.split(re);
+
+                // subsArr will represent array of substitute ingredients from one string
                 let subsArr = [];
                 for (let j = 0; j < subsStr.length; j++) {
+                  // parse first word in each string as a numeric value and multiply it by
+                  // response.data.targetAmount
                   let str = eval(subsStr[j].trim().split(" ")[0]) * response.data.targetAmount;
+
+                  // round value to nearest hundredth if it's not a whole number
                   str % 1 == 0 ? str = str : str = str.toFixed(2);
+
+                  // concatenate the rest of the string to the newly converted value
                   str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length);
+
+                  // push this string into subsArr
                   subsArr.push(str.trim());
                 }
+
+                // subsArr format example: ["0.44 cup [ingredient]", "0.5 tsp [ingredient]"]
                 if (i == 0) {
                   setSubs([subsArr]);
                 } else {
