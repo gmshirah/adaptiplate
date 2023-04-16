@@ -79,13 +79,10 @@ const Ingredient = ({ ingredient }) => {
                 let subsStr = arr[i].split("=")[1].trim();
                 
                 // regex to split subsStr at "+" and "and" (API responses are inconsistent)
-                // const re = / and | \+ /g;
                 const re = /(?: and | \+ )([1-9])/g;
 
                 // subsStr format example: ["7/8 cup [ingredient]", "1 tsp [ingredient]"]
                 subsStr = subsStr.split(re);
-
-                console.log(subsStr);
 
                 // subsArr will represent array of substitute ingredients from one string
                 let subsArr = [];
