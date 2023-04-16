@@ -48,7 +48,7 @@ const Ingredient = ({ ingredient }) => {
     e.preventDefault();
     if (!subs) {
       setLoading(true);
-      setSubs([]);
+      setSubs(Array());
       axios.get(`${api}/food/ingredients/${ingredient.id}/substitutes`, {
         headers: {
           'X-RapidAPI-Key': apiKey,
@@ -99,7 +99,7 @@ const Ingredient = ({ ingredient }) => {
 
                 for (let j = 0; j < subsStr.length; j += 2) {
                   if (j >= 2) {
-                    subsStr[j] = subsStr[j-1].trim() + subsStr[j].trim();
+                    subsStr[j] = subsStr[j-1] + subsStr[j];
                   }
 
                   if (ingredient.measures.us.unitShort == "") {
@@ -109,6 +109,23 @@ const Ingredient = ({ ingredient }) => {
 
                     // round value to nearest hundredth if it's not a whole number
                     str % 1 == 0 ? str = str : str = str.toFixed(2);
+
+                    // concatenate the rest of the string to the newly converted value
+                    str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length +
+                        subsStr[j].trim().split(" ")[1].length + 1);
+
+                    // push this string into subsArr
+                    subsArr.push(str.trim());
+                  } else if (!targetAmount) {
+                    // parse first word in each string as a numeric value and multiply it by
+                    // ingredient.amount
+                    let str = eval(subsStr[j].trim().split(" ")[0]) * ingredient.amount;
+
+                    // round value to nearest hundredth if it's not a whole number
+                    str % 1 == 0 ? str = str : str = str.toFixed(2);
+
+                    // concatenate original ingredient unit as best guess
+                    str += " " + ingredient.measures.us.unitShort;
 
                     // concatenate the rest of the string to the newly converted value
                     str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length +
@@ -133,11 +150,7 @@ const Ingredient = ({ ingredient }) => {
                 }
 
                 // subsArr format example: ["0.44 cup [ingredient]", "0.5 tsp [ingredient]"]
-                if (i == 0) {
-                  setSubs([subsArr]);
-                } else {
-                  setSubs(oldArray => [...oldArray, subsArr]);
-                }
+                setSubs(oldArray => [...oldArray, subsArr]);
               })
               .catch((error) => {
                 setLoading(false);
