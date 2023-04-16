@@ -79,14 +79,21 @@ const Ingredient = ({ ingredient }) => {
                 let subsStr = arr[i].split("=")[1].trim();
                 
                 // regex to split subsStr at "+" and "and" (API responses are inconsistent)
-                const re = /and|\+/g;
+                // const re = / and | \+ /g;
+                const re = /(?: and | \+ )([1-9])/g;
 
                 // subsStr format example: ["7/8 cup [ingredient]", "1 tsp [ingredient]"]
                 subsStr = subsStr.split(re);
 
+                console.log(subsStr);
+
                 // subsArr will represent array of substitute ingredients from one string
                 let subsArr = [];
-                for (let j = 0; j < subsStr.length; j++) {
+                for (let j = 0; j < subsStr.length; j += 2) {
+                  if (j >= 2) {
+                    subsStr[j] = subsStr[j-1].trim() + subsStr[j].trim();
+                  }
+
                   // parse first word in each string as a numeric value and multiply it by
                   // response.data.targetAmount
                   let str = eval(subsStr[j].trim().split(" ")[0]) * response.data.targetAmount;
