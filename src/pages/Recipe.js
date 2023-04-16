@@ -35,7 +35,14 @@ function parseSubResponse(response) {
 
 const Ingredient = ({ ingredient }) => {
   const [subs, setSubs] = useState(null);
+  const [numSubs, setNumSubs] = useState(99);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (subs && subs.length == numSubs) {
+      setLoading(false);
+    }
+  }, [subs, numSubs]);
 
   const onIngredientClick = (e) => {
     e.preventDefault();
@@ -51,6 +58,7 @@ const Ingredient = ({ ingredient }) => {
         .then((response) => {
           if (response.data.substitutes) {
             let arr = response.data.substitutes;
+            setNumSubs(arr.length);
             for (let i = 0; i < arr.length; i++) {
               let parsedSub = parseSubResponse(arr[i]);
               axios.get(`${api}/recipes/convert`, {
@@ -111,10 +119,6 @@ const Ingredient = ({ ingredient }) => {
                 } else {
                   setSubs(oldArray => [...oldArray, subsArr]);
                 }
-
-                if (i == arr.length - 1) {
-                  setLoading(false);
-                }
               })
               .catch((error) => {
                 setLoading(false);
@@ -131,9 +135,6 @@ const Ingredient = ({ ingredient }) => {
           setLoading(false);
           alert("Error retrieving substitutions. Please try again!");
           console.error(error);
-        })
-        .then(() => {
-
         });
     }
   };
