@@ -74,6 +74,8 @@ const Ingredient = ({ ingredient }) => {
                 }
               })
               .then((response) => {
+                let targetAmount = response.data.targetAmount;
+
                 // arr[i] format example: 1 cup = 7/8 cup [ingredient] + 1 tsp [ingredient]
 
                 // response.data.targetAmount example:
@@ -94,23 +96,40 @@ const Ingredient = ({ ingredient }) => {
 
                 // subsArr will represent array of substitute ingredients from one string
                 let subsArr = [];
+
                 for (let j = 0; j < subsStr.length; j += 2) {
                   if (j >= 2) {
                     subsStr[j] = subsStr[j-1].trim() + subsStr[j].trim();
                   }
 
-                  // parse first word in each string as a numeric value and multiply it by
-                  // response.data.targetAmount
-                  let str = eval(subsStr[j].trim().split(" ")[0]) * response.data.targetAmount;
+                  if (ingredient.measures.us.unitShort == "") {
+                    // parse first word in each string as a numeric value and multiply it by
+                    // ingredient.amount
+                    let str = eval(subsStr[j].trim().split(" ")[0]) * ingredient.amount;
 
-                  // round value to nearest hundredth if it's not a whole number
-                  str % 1 == 0 ? str = str : str = str.toFixed(2);
+                    // round value to nearest hundredth if it's not a whole number
+                    str % 1 == 0 ? str = str : str = str.toFixed(2);
 
-                  // concatenate the rest of the string to the newly converted value
-                  str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length);
+                    // concatenate the rest of the string to the newly converted value
+                    str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length +
+                        subsStr[j].trim().split(" ")[1].length + 1);
 
-                  // push this string into subsArr
-                  subsArr.push(str.trim());
+                    // push this string into subsArr
+                    subsArr.push(str.trim());
+                  } else {
+                    // parse first word in each string as a numeric value and multiply it by
+                    // response.data.targetAmount
+                    let str = eval(subsStr[j].trim().split(" ")[0]) * targetAmount;
+
+                    // round value to nearest hundredth if it's not a whole number
+                    str % 1 == 0 ? str = str : str = str.toFixed(2);
+
+                    // concatenate the rest of the string to the newly converted value
+                    str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length);
+
+                    // push this string into subsArr
+                    subsArr.push(str.trim());
+                  }
                 }
 
                 // subsArr format example: ["0.44 cup [ingredient]", "0.5 tsp [ingredient]"]
