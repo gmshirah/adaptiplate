@@ -339,7 +339,11 @@ function Home ()
               ) )
             )}
           </Row>
-          <Button variant="secondary" id="switchCardLayoutBtn" onClick={switchCardLayout}>Switch Card Layout</Button>
+          {searchHistory.length > 0 ? (
+            <Button variant="secondary" id="switchCardLayoutBtn" onClick={switchCardLayout}>Switch Card Layout</Button>
+          ) : (
+            <span />
+          )}
         </div>
       }
     </Container>
