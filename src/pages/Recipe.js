@@ -198,7 +198,7 @@ const Ingredient = ({ ingredient, onInfoClick }) => {
                       <span />
                     )}
                   </div>
-                  <span className="material-symbols-outlined" id="infoIcon" onClick={onInfoClick}>
+                  <span className="material-symbols-outlined" id="infoIcon" onClick={() => {onInfoClick(sub);}}>
                     info
                   </span>
                 </Container>
@@ -233,6 +233,7 @@ function Recipe() {
 
   const [showNutrition, setShowNutrition] = useState(false);
   const [nutritionInfo, setNutritionInfo] = useState(Array(Array()));
+  const [nutritionLoading, setNutritionLoading] = useState(false);
 
   useEffect(() => {
     const dbRef = ref(getDatabase());
@@ -336,8 +337,42 @@ function Recipe() {
     }
   }
 
-  const onInfoClick = () => {
+  const onInfoClick = (ingredients) => {
+    if (!Array.isArray(ingredients)) {
+      alert("Ingredients parameter is not an array!");
+      return;
+    }
+
+    setNutritionLoading(true);
     setShowNutrition(true);
+
+    let str = ingredients[0];
+    for (let i = 1; i < ingredients.length; i++) {
+      str += "\n" + ingredients[i];
+    }
+
+    const encodedParams = new URLSearchParams();
+    encodedParams.append("ingredientList", str);
+    encodedParams.append("servings", "1");
+
+    axios.post(`${api}/recipes/parseIngredients`, encodedParams, {
+      params: {
+        'includeNutrition': true,
+        'language': "en",
+      },
+      headers: {
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': apiHost
+      }
+    })
+    .then((response) => {
+      setNutritionInfo(response.data);
+      setNutritionLoading(false);
+    })
+    .catch((error) => {
+      alert("Error retrieving nutritional information. Please try again!");
+      console.error(error);
+    });
   };
 
   const onNutritionClose = () => {
@@ -356,15 +391,29 @@ function Recipe() {
                 close
               </span>
             </Alert.Heading>
-            {nutritionInfo.map(ingredient =>
-              <div>
+            {nutritionLoading ? (
+              <div id="nutritionLoadingDiv">
                 <hr />
-                {ingredient.map(nutrition =>
-                  <div>
-                    <p></p>
-                  </div>
-                )}
+                <div id="nutritionLoadingScreen">
+                  <Spinner id="nutritionLoadingSpinner" variant="dark" animation="border" />
+                </div>
               </div>
+            ) : (
+              nutritionInfo && nutritionInfo.map(ingredient =>
+                <div id="ingredientNutritionDiv">
+                  <hr />
+                  <div id="ingredientNutritionName">{ingredient.amount}{ingredient.unit == "" ? " " : " " + ingredient.unit + " "}{ingredient.name}</div>
+                  {ingredient.nutrition && ingredient.nutrition.nutrients.map(nutrient =>
+                    <div>
+                      <span><b>{nutrient.name}</b></span>
+                      <div id="nutritionStatsDiv">
+                        <span>{nutrient.amount} {nutrient.unit}</span>
+                        <span>{nutrient.percentOfDailyNeeds}% DV</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
             )}
           </Alert>
         </div>

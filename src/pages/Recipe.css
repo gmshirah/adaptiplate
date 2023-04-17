@@ -278,3 +278,34 @@ div.container {
     align-items: center;
     font-size: 28px;
 }
+
+#ingredientNutritionDiv {
+    text-align: start;
+}
+
+#ingredientNutritionName {
+    margin-bottom: 1rem;
+    font-weight: 800;
+    font-size: 24px;
+    text-transform: capitalize;
+}
+
+#nutritionStatsDiv {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#nutritionLoadingDiv {
+    height: 90%;
+    width: 100%;
+}
+
+#nutritionLoadingScreen {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
