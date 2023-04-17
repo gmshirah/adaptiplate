@@ -12,7 +12,8 @@ import
   InputGroup,
   Row,
   Card,
-  Spinner
+  Spinner,
+  Image
 } from 'react-bootstrap';
 import
 {
@@ -72,6 +73,72 @@ const RecipeCard = ( { recipe, path } ) =>
   );
 };
 
+const RecipeCardAlt = ( { recipe, path } ) =>
+{
+  const handleClick = ( event ) =>
+  {
+  };
+
+  return (
+    <Col md={6}>
+      <Link to={`/recipe/${recipe.id}`} id="recipeCardLinkAlt" onClick={handleClick}>
+        <div id="recipeCardAlt">
+          <div id="recipeCardHeaderAlt">
+            <Image thumbnail id="recipeImageAlt" src={recipe.image} />
+            <div id="recipeTitleDivAlt">
+              <h4 id="recipeTitleAlt">{recipe.title}</h4>
+              <div id="cardDietTags">
+                {recipe.dairyFree ? (
+                  <span id="cardTag">Dairy Free</span>
+                ) : (<span />)}
+                {recipe.glutenFree ? (
+                  <span id="cardTag">Gluten Free</span>
+                ) : (<span />)}
+                {recipe.lowFodmap ? (
+                  <span id="cardTag">Low FODMAP</span>
+                ) : (<span />)}
+                {recipe.sustainable ? (
+                  <span id="cardTag">Sustainable</span>
+                ) : (<span />)}
+                {recipe.vegan ? (
+                  <span id="cardTag">Vegan</span>
+                ) : (<span />)}
+                {recipe.vegetarian ? (
+                  <span id="cardTag">Vegetarian</span>
+                ) : (<span />)}
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div id="recipeCardBodyAlt">
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
+                payments
+              </div>
+              <p id="cardStatText">${(recipe.pricePerServing / 100).toFixed(2)}</p>
+              <p id="cardStatName"><i>per serving</i></p>
+            </div>
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
+                favorite
+              </div>
+              <p id="cardStatText">{recipe.healthScore}</p>
+              <p id="cardStatName"><i>health score</i></p>
+            </div>
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
+                schedule
+              </div>
+              <p id="cardStatText">{recipe.readyInMinutes}</p>
+              <p id="cardStatName"><i>minutes</i></p>
+            </div>
+          </div>
+        </div>
+      </Link>
+    </Col>
+  );
+};
+
 function parseId ( source, title )
 {
   return source.replace( / /g, "-" ).toLowerCase().split( "." )[ 0 ] + "-" + title.replace( / /g, "-" ).toLowerCase();
@@ -87,7 +154,7 @@ function Home ()
 
   const [ historyLoaded, setHistoryLoaded ] = useState( false );
 
-
+  const [cardLayout, setCardLayout] = useState(false);
 
   const handleNewSearch = async ( event ) =>
   {
@@ -197,6 +264,15 @@ function Home ()
       if ( currentUser )
       {
         const dbRef = ref( getDatabase() );
+        
+        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists() && snapshot.val().cardLayout) {
+            setCardLayout(snapshot.val().cardLayout);
+          }
+        }).catch((error) => {
+          console.error(error);
+        });
+
         const recentRecipesRef = child( dbRef, `users/${ currentUser.uid }/recentlyViewed` );
         get( recentRecipesRef ).then( ( snapshot ) =>
         {
@@ -222,6 +298,9 @@ function Home ()
     } );
   }, [] );
 
+  const switchCardLayout = (event) => {
+    setCardLayout(!cardLayout);
+  };
 
   return (
     <Container>
@@ -250,10 +329,17 @@ function Home ()
       {
         <div>
           <Row>
-            {searchHistory.map( ( recipe ) => (
-              <RecipeCard key={recipe.id} recipe={recipe} />
-            ) )}
+            {cardLayout ? (
+              searchHistory.map( ( recipe ) => (
+                <RecipeCardAlt key={recipe.id} recipe={recipe} />
+              ) )
+            ) : (
+              searchHistory.map( ( recipe ) => (
+                <RecipeCard key={recipe.id} recipe={recipe} />
+              ) )
+            )}
           </Row>
+          <Button variant="secondary" id="switchCardLayoutBtn" onClick={switchCardLayout}>Switch Card Layout</Button>
         </div>
       }
     </Container>
