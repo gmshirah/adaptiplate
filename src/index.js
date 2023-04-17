@@ -10,6 +10,10 @@ import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Search from './pages/Search';
+import DietaryRestrictions from './pages/settings/DietaryRestrictions';
+import NutritionalPreferences from './pages/settings/NutritionalPreferences';
+import FinancialPreferences from './pages/settings/FinancialPreferences';
+import AppAppearance from './pages/settings/AppAppearance';
 import reportWebVitals from './reportWebVitals';
 
 // Import the functions you need from the SDKs you need
@@ -55,6 +59,10 @@ root.render(
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/settings/dietary-restrictions" element={<DietaryRestrictions />} />
+        <Route path="/settings/nutritional-preferences" element={<NutritionalPreferences />} />
+        <Route path="/settings/financial-preferences" element={<FinancialPreferences />} />
+        <Route path="/settings/app-appearance" element={<AppAppearance />} />
         <Route
           path="*"
           element={<Navigate to="/" replace />}

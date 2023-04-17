@@ -1,7 +1,7 @@
 import './Settings.css';
 import { app } from '../index.js';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ListGroup, Container, Image, Alert, Button, Form } from 'react-bootstrap';
 import
 {
@@ -27,6 +27,8 @@ function Settings ()
   // Initialize Firebase Authentication and get a reference to the service
   const auth = getAuth( app );
   // const user = auth.currentUser;
+
+  const navigate = useNavigate();
 
   const [loggedIn, setLoggedIn] = useState(false);
   const [deleteUserConfirm, setDeleteUserConfirm] = useState(false);
@@ -113,25 +115,25 @@ function Settings ()
           <h1 id="titleText">Settings</h1>
           <Image id="accountImage" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" roundedCircle fluid thumbnail />
           <ListGroup id="settings" variant="flush">
-            <ListGroup.Item id="setting">
+            <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/dietary-restrictions`);}}>
               <span id="settingText">Dietary Restrictions</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
               </span>
             </ListGroup.Item>
-            <ListGroup.Item id="setting">
+            <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/nutritional-preferences`);}}>
               <span id="settingText">Nutritional Preferences</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
               </span>
             </ListGroup.Item>
-            <ListGroup.Item id="setting">
+            <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/financial-preferences`);}}>
               <span id="settingText">Financial Preferences</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
               </span>
             </ListGroup.Item>
-            <ListGroup.Item id="setting">
+            <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/app-appearance`);}}>
               <span id="settingText">App Appearance</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
