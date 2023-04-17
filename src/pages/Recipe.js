@@ -14,7 +14,8 @@ import {
   Image,
   Tabs,
   Tab,
-  Spinner
+  Spinner,
+  Alert
 } from 'react-bootstrap';
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -33,7 +34,7 @@ function parseSubResponse(response) {
   return response.split(" ");
 }
 
-const Ingredient = ({ ingredient }) => {
+const Ingredient = ({ ingredient, onInfoClick }) => {
   const [subs, setSubs] = useState(null);
   const [numSubs, setNumSubs] = useState(99);
   const [loading, setLoading] = useState(false);
@@ -197,7 +198,7 @@ const Ingredient = ({ ingredient }) => {
                       <span />
                     )}
                   </div>
-                  <span className="material-symbols-outlined" id="infoIcon">
+                  <span className="material-symbols-outlined" id="infoIcon" onClick={onInfoClick}>
                     info
                   </span>
                 </Container>
@@ -229,6 +230,9 @@ function Recipe() {
   const [recipeData, setRecipeData] = useState([]);
   const [ingredientData, setIngredientData] = useState([]);
   const [instructionData, setInstructionData] = useState([]);
+
+  const [showNutrition, setShowNutrition] = useState(false);
+  const [nutritionInfo, setNutritionInfo] = useState(Array(Array()));
 
   useEffect(() => {
     const dbRef = ref(getDatabase());
@@ -332,8 +336,42 @@ function Recipe() {
     }
   }
 
+  const onInfoClick = () => {
+    setShowNutrition(true);
+  };
+
+  const onNutritionClose = () => {
+    setShowNutrition(false);
+    setNutritionInfo(Array(Array()));
+  };
+
   return (
     <Container>
+      {showNutrition ? (
+        <div id="nutritionDiv">
+          <Alert id="nutritionAlert" variant="secondary">
+            <Alert.Heading id="nutritionAlertHeading">
+              <span>Nutrition</span>
+              <span id="nutritionAlertCloseIcon" className="material-symbols-outlined" onClick={onNutritionClose}>
+                close
+              </span>
+            </Alert.Heading>
+            {nutritionInfo.map(ingredient =>
+              <div>
+                <hr />
+                {ingredient.map(nutrition =>
+                  <div>
+                    <p></p>
+                  </div>
+                )}
+              </div>
+            )}
+          </Alert>
+        </div>
+      ) : (
+        <span />
+      )}
+
       <div id="recipeHeader">
         <div id="backDiv">
           <Button onClick={BackButtonClick} id="backBtn">
@@ -412,7 +450,7 @@ function Recipe() {
         <Tab eventKey="ingredients" title="Ingredients">
           {ingredientData.map(ingredient =>
             <Accordion>
-              <Ingredient key={ingredient.id} ingredient={ingredient} />
+              <Ingredient key={ingredient.id} ingredient={ingredient} onInfoClick={onInfoClick} />
             </Accordion>
           )}
         </Tab>
