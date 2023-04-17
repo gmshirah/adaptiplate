@@ -198,7 +198,7 @@ const Ingredient = ({ ingredient, onInfoClick }) => {
                       <span />
                     )}
                   </div>
-                  <span className="material-symbols-outlined" id="infoIcon" onClick={() => {onInfoClick(sub);}}>
+                  <span className="material-symbols-outlined" id="infoIcon" onClick={() => {onInfoClick(sub, ingredient);}}>
                     info
                   </span>
                 </Container>
@@ -233,6 +233,8 @@ function Recipe() {
 
   const [showNutrition, setShowNutrition] = useState(false);
   const [nutritionInfo, setNutritionInfo] = useState(Array(Array()));
+  const [originalNutritionInfo, setOriginalNutritionInfo] = useState(Array());
+  const [subNutritionInfo, setSubNutritionInfo] = useState(Array());
   const [nutritionLoading, setNutritionLoading] = useState(false);
 
   useEffect(() => {
@@ -337,7 +339,7 @@ function Recipe() {
     }
   }
 
-  const onInfoClick = (ingredients) => {
+  const onInfoClick = (ingredients, originalIngredient) => {
     if (!Array.isArray(ingredients)) {
       alert("Ingredients parameter is not an array!");
       return;
@@ -351,7 +353,7 @@ function Recipe() {
       str += "\n" + ingredients[i];
     }
 
-    const encodedParams = new URLSearchParams();
+    let encodedParams = new URLSearchParams();
     encodedParams.append("ingredientList", str);
     encodedParams.append("servings", "1");
 
@@ -367,7 +369,44 @@ function Recipe() {
     })
     .then((response) => {
       setNutritionInfo(response.data);
-      setNutritionLoading(false);
+
+      // TODO: nutrients arrays are not always the same size, some are
+      // missing elements
+
+      let arr = response.data[0].nutrition.nutrients;
+      for (let i = 1; i < response.data.length; i++) {
+        for (let j = 0; j < arr.length; j++) {
+          arr[j].amount += response.data[i].nutrition.nutrients[j].amount;
+          arr[j].percentOfDailyNeeds += response.data[i].nutrition.nutrients[j].percentOfDailyNeeds;
+        }
+      }
+
+      setSubNutritionInfo(arr);
+
+      encodedParams = new URLSearchParams();
+      encodedParams.append("ingredientList", `${originalIngredient.amount} ${originalIngredient.measures.us.unitShort} ${originalIngredient.name}`);
+      encodedParams.append("servings", "1");
+
+      axios.post(`${api}/recipes/parseIngredients`, encodedParams, {
+        params: {
+          'includeNutrition': true,
+          'language': "en",
+        },
+        headers: {
+          'X-RapidAPI-Key': apiKey,
+          'X-RapidAPI-Host': apiHost
+        }
+      })
+      .then((response) => {
+        if (response.data[0].nutrition) {
+          setOriginalNutritionInfo(response.data[0].nutrition.nutrients);
+        }
+        setNutritionLoading(false);
+      })
+      .catch((error) => {
+        alert("Error retrieving nutritional information. Please try again!");
+        console.error(error);
+      });
     })
     .catch((error) => {
       alert("Error retrieving nutritional information. Please try again!");
@@ -399,21 +438,35 @@ function Recipe() {
                 </div>
               </div>
             ) : (
-              nutritionInfo && nutritionInfo.map(ingredient =>
-                <div id="ingredientNutritionDiv">
-                  <hr />
-                  <div id="ingredientNutritionName">{ingredient.amount}{ingredient.unit == "" ? " " : " " + ingredient.unit + " "}{ingredient.name}</div>
-                  {ingredient.nutrition && ingredient.nutrition.nutrients.map(nutrient =>
-                    <div>
-                      <span><b>{nutrient.name}</b></span>
-                      <div id="nutritionStatsDiv">
-                        <span>{nutrient.amount} {nutrient.unit}</span>
-                        <span>{nutrient.percentOfDailyNeeds}% DV</span>
+              <div>
+                <hr />
+                <Tabs
+                  defaultActiveKey="substitutes"
+                  id="nutritionTab"
+                  justify
+                >
+                  <Tab eventKey="substitutes" title="Substitutes">
+                    {nutritionInfo && nutritionInfo.map(ingredient =>
+                      <div id="ingredientNutritionDiv">
+                        <hr />
+                        <div id="ingredientNutritionName">{ingredient.amount}{ingredient.unit == "" ? " " : " " + ingredient.unit + " "}{ingredient.name}</div>
+                        {ingredient.nutrition && ingredient.nutrition.nutrients.map(nutrient =>
+                          <div>
+                            <span><b>{nutrient.name}</b></span>
+                            <div id="nutritionStatsDiv">
+                              <span>{nutrient.amount} {nutrient.unit}</span>
+                              <span>{nutrient.percentOfDailyNeeds}% DV</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  )}
-                </div>
-              )
+                    )}
+                  </Tab>
+                  <Tab eventKey="comparison" title="Comparison">
+                    {/* TODO */}
+                  </Tab>
+                </Tabs>
+              </div>
             )}
           </Alert>
         </div>

@@ -309,3 +309,19 @@ div.container {
     align-items: center;
     justify-content: center;
 }
+
+#nutritionTab-tab-substitutes.nav-link,
+#nutritionTab-tab-comparison.nav-link {
+    color: #41464b;
+    font-weight: 600;
+    transition: none;
+}
+
+#nutritionTab-tab-substitutes.nav-link.active,
+#nutritionTab-tab-comparison.nav-link.active {
+    color: #41464b;
+    font-weight: 600;
+    background-color: rgb(180, 180, 180);
+    border-radius: 20px;
+    transition: none;
+}
