@@ -233,8 +233,7 @@ function Recipe() {
 
   const [showNutrition, setShowNutrition] = useState(false);
   const [nutritionInfo, setNutritionInfo] = useState(Array(Array()));
-  const [originalNutritionInfo, setOriginalNutritionInfo] = useState(Array());
-  const [subNutritionInfo, setSubNutritionInfo] = useState(Array());
+  const [compareNutritionInfo, setCompareNutritionInfo] = useState(Array());
   const [nutritionLoading, setNutritionLoading] = useState(false);
 
   useEffect(() => {
@@ -373,15 +372,22 @@ function Recipe() {
       // TODO: nutrients arrays are not always the same size, some are
       // missing elements
 
-      let arr = response.data[0].nutrition.nutrients;
+      let arr = response.data[0].nutrition.nutrients.slice();
       for (let i = 1; i < response.data.length; i++) {
         for (let j = 0; j < arr.length; j++) {
-          arr[j].amount += response.data[i].nutrition.nutrients[j].amount;
-          arr[j].percentOfDailyNeeds += response.data[i].nutrition.nutrients[j].percentOfDailyNeeds;
+          const isMatch = (element) => element.name == arr[j].name;
+
+          if (response.data[i].nutrition.nutrients.findIndex(isMatch) == -1) {
+            arr.splice(j, 1);
+            j--;
+          } else {
+            arr[j].amount += response.data[i].nutrition.nutrients.find(isMatch).amount;
+            arr[j].percentOfDailyNeeds += response.data[i].nutrition.nutrients.find(isMatch).percentOfDailyNeeds;
+            if (arr[j].amount % 1 != 0) arr[j].amount = arr[j].amount.toFixed(2);
+            if (arr[j].percentOfDailyNeeds % 1 != 0) arr[j].percentOfDailyNeeds = arr[j].percentOfDailyNeeds.toFixed(2);
+          }
         }
       }
-
-      setSubNutritionInfo(arr);
 
       encodedParams = new URLSearchParams();
       encodedParams.append("ingredientList", `${originalIngredient.amount} ${originalIngredient.measures.us.unitShort} ${originalIngredient.name}`);
@@ -399,7 +405,21 @@ function Recipe() {
       })
       .then((response) => {
         if (response.data[0].nutrition) {
-          setOriginalNutritionInfo(response.data[0].nutrition.nutrients);
+          for (let i = 0; i < arr.length; i++) {
+            const isMatch = (element) => element.name == arr[i].name;
+  
+            if (response.data[0].nutrition.nutrients.findIndex(isMatch) == -1) {
+              arr.splice(i, 1);
+              i--;
+            } else {
+              arr[i].compareAmount = response.data[0].nutrition.nutrients.find(isMatch).amount;
+              arr[i].comparePercentOfDailyNeeds = response.data[0].nutrition.nutrients.find(isMatch).percentOfDailyNeeds;
+              if (arr[i].compareAmount % 1 != 0) arr[i].compareAmount = arr[i].compareAmount.toFixed(2);
+              if (arr[i].comparePercentOfDailyNeeds % 1 != 0) arr[i].comparePercentOfDailyNeeds = arr[i].comparePercentOfDailyNeeds.toFixed(2);
+            }
+          }
+
+          setCompareNutritionInfo(arr);
         }
         setNutritionLoading(false);
       })
@@ -463,7 +483,21 @@ function Recipe() {
                     )}
                   </Tab>
                   <Tab eventKey="comparison" title="Comparison">
-                    {/* TODO */}
+                    <hr />
+                    <div id="comparisonTitle">Substitute(s) VS <span id="compareIngredientName">Original</span></div>
+                    {compareNutritionInfo && compareNutritionInfo.map(nutrient =>
+                      <div id="ingredientNutritionDiv">
+                        <span><b>{nutrient.name}</b></span>
+                        <div id="nutritionStatsDiv">
+                          <span>{nutrient.amount} {nutrient.unit}</span>
+                          <span>{nutrient.percentOfDailyNeeds}% DV</span>
+                        </div>
+                        <div id="compareNutritionStatsDiv">
+                          <span>{nutrient.compareAmount} {nutrient.unit}</span>
+                          <span>{nutrient.comparePercentOfDailyNeeds}% DV</span>
+                        </div>
+                      </div>
+                    )}
                   </Tab>
                 </Tabs>
               </div>

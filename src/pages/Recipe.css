@@ -290,10 +290,26 @@ div.container {
     text-transform: capitalize;
 }
 
-#nutritionStatsDiv {
+#comparisonTitle {
+    margin-bottom: 1rem;
+    font-weight: 800;
+    font-size: 24px;
+    text-align: start;
+}
+
+#compareIngredientName {
+    color: red;
+}
+
+#nutritionStatsDiv,
+#compareNutritionStatsDiv {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+#compareNutritionStatsDiv {
+    color: red;
 }
 
 #nutritionLoadingDiv {
