@@ -133,7 +133,8 @@ function Settings ()
                 navigate_next
               </span>
             </ListGroup.Item>
-            <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/app-appearance`);}}>
+            {/* <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/app-appearance`);}}> */}
+            <ListGroup.Item id="setting">
               <span id="settingText">App Appearance</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
