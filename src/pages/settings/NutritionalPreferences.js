@@ -64,38 +64,7 @@ function NutritionalPreferences ()
 
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const [userData, setUserData] = useState([
-    {
-      "id": "lowFat",
-      "index": 0,
-      "name": "Low Fat",
-      "value": false
-    },
-    {
-      "id": "highProtein",
-      "index": 1,
-      "name": "High Protein",
-      "value": false
-    },
-    {
-      "id": "lowCarb",
-      "index": 2,
-      "name": "Low Carb",
-      "value": false
-    },
-    {
-      "id": "lowSugar",
-      "index": 3,
-      "name": "Low Sugar",
-      "value": false
-    },
-    {
-      "id": "highFiber",
-      "index": 4,
-      "name": "High Fiber",
-      "value": false
-    }
-  ]);
+  const [userData, setUserData] = useState(prefs);
 
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
