@@ -369,9 +369,6 @@ function Recipe() {
     .then((response) => {
       setNutritionInfo(response.data);
 
-      // TODO: nutrients arrays are not always the same size, some are
-      // missing elements
-
       let arr = response.data[0].nutrition.nutrients.slice();
       for (let i = 1; i < response.data.length; i++) {
         for (let j = 0; j < arr.length; j++) {
