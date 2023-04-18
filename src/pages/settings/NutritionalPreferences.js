@@ -1,3 +1,4 @@
+import './NutritionalPreferences.css';
 import { app } from '../../index.js';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
@@ -30,39 +31,16 @@ function NutritionalPreferences ()
   // const user = auth.currentUser;
 
   const prefs = [
-    {
-      "id": "lowFat",
-      "index": 0,
-      "name": "Low Fat",
-      "value": false
-    },
-    {
-      "id": "highProtein",
-      "index": 1,
-      "name": "High Protein",
-      "value": false
-    },
-    {
-      "id": "lowCarb",
-      "index": 2,
-      "name": "Low Carb",
-      "value": false
-    },
-    {
-      "id": "lowSugar",
-      "index": 3,
-      "name": "Low Sugar",
-      "value": false
-    },
-    {
-      "id": "highFiber",
-      "index": 4,
-      "name": "High Fiber",
-      "value": false
-    }
+    ["lowFat", "Low Fat"],
+    ["highProtein", "High Protein"],
+    ["lowCarb", "Low Carb"],
+    ["lowSugar", "Low Sugar"],
+    ["highFiber", "High Fiber"]
   ];
 
   const [loggedIn, setLoggedIn] = useState(false);
+
+  const [changed, setChanged] = useState(99);
 
   const [userData, setUserData] = useState(Array());
 
@@ -71,19 +49,20 @@ function NutritionalPreferences ()
       if (currentUser) {
         const dbRef = ref(getDatabase());
         get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
-          console.log(currentUser.uid)
           if (snapshot.exists()) {
             setUserData(snapshot.val());
             if (!snapshot.val().nutritionalPreferences) {
-                for (let i = 0; i < prefs.length; i++) {
-                    const newDietRef = child(dbRef, `users/${currentUser.uid}/nutritionalPreferences/${i}`);
-                    set(newDietRef, {
-                        id: prefs[i][0],
-                        index: i,
-                        name: prefs[i][1],
-                        value: false,
-                    });
-                }
+              for (let i = 0; i < prefs.length; i++) {
+                const newPrefRef = child(dbRef, `users/${currentUser.uid}/nutritionalPreferences/${i}`);
+                set(newPrefRef, {
+                    id: prefs[i][0],
+                    index: i,
+                    name: prefs[i][1],
+                    value: false,
+                }).then(() => {
+                  setChanged(i);
+                });
+              }
             }
           }
         }).catch((error) => {
@@ -95,10 +74,24 @@ function NutritionalPreferences ()
     });
   }, []);
 
-  const changeDiet = (index, value) => {
+  useEffect(() => {
+    if (auth.currentUser) {
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          setUserData(snapshot.val());
+        }
+      }).catch((error) => {
+        console.error(error);
+        alert("Error retrieving user data.");
+      });
+    }
+  }, [changed]);
+
+  const changePref = (index, value) => {
     const dbRef = ref(getDatabase());
-    const dietRef = child(dbRef, `users/${auth.currentUser.uid}/nutritionalPreferences/${index}`);
-    update(dietRef, {
+    const prefRef = child(dbRef, `users/${auth.currentUser.uid}/nutritionalPreferences/${index}`);
+    update(prefRef, {
         value: value
     }).catch((error) => {
         console.error(error);
@@ -135,12 +128,11 @@ function NutritionalPreferences ()
       {loggedIn ? (
         <div>
           <h1 id="titleText">Nutritional Preferences</h1>
-          {console.log(userData.nutritionalPreferences)}
           <ListGroup id="nutritionalPreferences" variant="flush">
-            {userData.nutritionalPreferences && userData.nutritionalPreferences.map(diet =>
-                <ListGroup.Item id="diet" onClick={() => {changeDiet(diet.index, !diet.value);}}>
-                    <span id="dietText">{diet.name}</span>
-                    <span>{IconSelector(diet.value)}</span>
+            {userData.nutritionalPreferences && userData.nutritionalPreferences.map(pref =>
+                <ListGroup.Item id="pref" onClick={() => {changePref(pref.index, !pref.value);}}>
+                    <span id="prefText">{pref.name}</span>
+                    <span>{IconSelector(pref.value)}</span>
                 </ListGroup.Item>
             )}
           </ListGroup>

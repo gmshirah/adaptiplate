@@ -41,6 +41,8 @@ function DietaryRestrictions ()
 
   const [loggedIn, setLoggedIn] = useState(false);
 
+  const [changed, setChanged] = useState(99);
+
   const [userData, setUserData] = useState(Array());
 
   useEffect(() => {
@@ -51,15 +53,17 @@ function DietaryRestrictions ()
           if (snapshot.exists()) {
             setUserData(snapshot.val());
             if (!snapshot.val().dietaryRestrictions) {
-                for (let i = 0; i < diets.length; i++) {
-                    const newDietRef = child(dbRef, `users/${currentUser.uid}/dietaryRestrictions/${i}`);
-                    set(newDietRef, {
-                        id: diets[i][0],
-                        index: i,
-                        name: diets[i][1],
-                        value: false,
-                    });
-                }
+              for (let i = 0; i < diets.length; i++) {
+                const newDietRef = child(dbRef, `users/${currentUser.uid}/dietaryRestrictions/${i}`);
+                set(newDietRef, {
+                    id: diets[i][0],
+                    index: i,
+                    name: diets[i][1],
+                    value: false,
+                }).then(() => {
+                  setChanged(i);
+                });
+              }
             }
           }
         }).catch((error) => {
@@ -70,6 +74,20 @@ function DietaryRestrictions ()
       setLoggedIn(currentUser != null);
     });
   }, []);
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          setUserData(snapshot.val());
+        }
+      }).catch((error) => {
+        console.error(error);
+        alert("Error retrieving user data.");
+      });
+    }
+  }, [changed]);
 
   const changeDiet = (index, value) => {
     const dbRef = ref(getDatabase());
