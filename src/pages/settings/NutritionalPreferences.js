@@ -93,17 +93,18 @@ function NutritionalPreferences ()
     const prefRef = child(dbRef, `users/${auth.currentUser.uid}/nutritionalPreferences/${index}`);
     update(prefRef, {
         value: value
+    }).then(() => {
+      get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
+        if (snapshot.exists()) {
+          setUserData(snapshot.val());
+        }
+      }).catch((error) => {
+        console.error(error);
+        alert("Error retrieving user data.");
+      });
     }).catch((error) => {
         console.error(error);
         alert("Error updating user data.");
-    });
-    get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-            setUserData(snapshot.val());
-        }
-    }).catch((error) => {
-        console.error(error);
-        alert("Error retrieving user data.");
     });
   };
 

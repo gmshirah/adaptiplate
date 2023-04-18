@@ -94,17 +94,18 @@ function DietaryRestrictions ()
     const dietRef = child(dbRef, `users/${auth.currentUser.uid}/dietaryRestrictions/${index}`);
     update(dietRef, {
         value: value
+    }).then(() => {
+      get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
+          if (snapshot.exists()) {
+              setUserData(snapshot.val());
+          }
+      }).catch((error) => {
+          console.error(error);
+          alert("Error retrieving user data.");
+      });
     }).catch((error) => {
         console.error(error);
         alert("Error updating user data.");
-    });
-    get(child(dbRef, `users/${auth.currentUser.uid}`)).then((snapshot) => {
-        if (snapshot.exists()) {
-            setUserData(snapshot.val());
-        }
-    }).catch((error) => {
-        console.error(error);
-        alert("Error retrieving user data.");
     });
   };
 
