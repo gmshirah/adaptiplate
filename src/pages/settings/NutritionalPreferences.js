@@ -64,7 +64,7 @@ function NutritionalPreferences ()
 
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const [userData, setUserData] = useState(prefs);
+  const [userData, setUserData] = useState(Array());
 
   useEffect(() => {
     onAuthStateChanged(auth, (currentUser) => {
@@ -73,7 +73,7 @@ function NutritionalPreferences ()
         get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
           console.log(currentUser.uid)
           if (snapshot.exists()) {
-            setUserData(prefs);
+            setUserData(snapshot.val());
             if (!snapshot.val().nutritionalPreferences) {
                 for (let i = 0; i < prefs.length; i++) {
                     const newDietRef = child(dbRef, `users/${currentUser.uid}/nutritionalPreferences/${i}`);
@@ -135,8 +135,9 @@ function NutritionalPreferences ()
       {loggedIn ? (
         <div>
           <h1 id="titleText">Nutritional Preferences</h1>
+          {console.log(userData.nutritionalPreferences)}
           <ListGroup id="nutritionalPreferences" variant="flush">
-            {prefs && prefs.map(diet =>
+            {userData.nutritionalPreferences && userData.nutritionalPreferences.map(diet =>
                 <ListGroup.Item id="diet" onClick={() => {changeDiet(diet.index, !diet.value);}}>
                     <span id="dietText">{diet.name}</span>
                     <span>{IconSelector(diet.value)}</span>
