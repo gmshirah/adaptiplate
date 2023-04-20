@@ -236,6 +236,8 @@ function Recipe() {
   const [compareNutritionInfo, setCompareNutritionInfo] = useState(Array());
   const [nutritionLoading, setNutritionLoading] = useState(false);
 
+  const [showAlert, setShowAlert] = useState(false);
+
   useEffect(() => {
     const dbRef = ref(getDatabase());
     get(child(dbRef, `recipes/${params.id}`)).then((snapshot) => {
@@ -282,6 +284,14 @@ function Recipe() {
       for (let id in userData.recipes) {
         if (userData.recipes[id].id === recipeData.id) {
           setSaved(true);
+        }
+      }
+    }
+
+    if (userData.dietaryRestrictions) {
+      for (let id in userData.dietaryRestrictions) {
+        if (!recipeData[userData.dietaryRestrictions[id].id] && userData.dietaryRestrictions[id].value) {
+          setShowAlert(true);
         }
       }
     }
@@ -521,6 +531,14 @@ function Recipe() {
           <Button onClick={SaveButtonClick} id="saveBtn">{StarSelector()}</Button>
         </div>
       </div>
+
+      {showAlert ? (
+        <Alert variant="danger">
+          <span>This recipe does not match your selected user preferences. Finding ingredient substitutions may be necessary.</span>
+        </Alert>
+      ) : (
+        <span />
+      )}
 
       {/* FOOD IMAGE  */}
       <Image id="recipeImage" src={recipeData.image} />
