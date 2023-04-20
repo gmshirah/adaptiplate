@@ -7,7 +7,9 @@ import
   Container,
   Row,
   Col,
-  Card
+  Card,
+  Image,
+  Button
 } from 'react-bootstrap';
 import
 {
@@ -33,16 +35,82 @@ const RecipeCard = ( { recipe, path } ) =>
     <Col md={6}>
       <Link to={`/recipe/${recipe.id}`} onClick={handleClick}>
         <Card id="recipeCard">
-          <Card.Img variant="top" src={recipe.img} />
+          <Card.Img variant="top" src={recipe.image} />
           <Card.ImgOverlay>
-            <h4 id="recipeTitle">{recipe.name}</h4>
+            <h4 id="recipeTitle">{recipe.title}</h4>
             <div id="recipeStats">
-              <Card.Text>{recipe.price}</Card.Text>
-              <Card.Text>{recipe.health}</Card.Text>
-              <Card.Text>{recipe.time}</Card.Text>
+              <Card.Text><b>${(recipe.pricePerServing / 100).toFixed(2)}</b> <i id="recipeStatsLabel">per serving</i></Card.Text>
+              <Card.Text><b>{recipe.healthScore}</b> <i id="recipeStatsLabel">health score</i></Card.Text>
+              <Card.Text><b>{recipe.readyInMinutes}</b> <i id="recipeStatsLabel">minutes</i></Card.Text>
             </div>
           </Card.ImgOverlay>
         </Card>
+      </Link>
+    </Col>
+  );
+};
+
+const RecipeCardAlt = ( { recipe, path } ) =>
+{
+  const handleClick = ( event ) =>
+  {
+  };
+
+  return (
+    <Col md={6}>
+      <Link to={`/recipe/${recipe.id}`} id="recipeCardLinkAlt" onClick={handleClick}>
+        <div id="recipeCardAlt">
+          <div id="recipeCardHeaderAlt">
+            <Image thumbnail id="recipeImageAlt" src={recipe.image} />
+            <div id="recipeTitleDivAlt">
+              <h4 id="recipeTitleAlt">{recipe.title}</h4>
+              <div id="cardDietTags">
+                {recipe.dairyFree ? (
+                  <span id="cardTag">Dairy Free</span>
+                ) : (<span />)}
+                {recipe.glutenFree ? (
+                  <span id="cardTag">Gluten Free</span>
+                ) : (<span />)}
+                {recipe.lowFodmap ? (
+                  <span id="cardTag">Low FODMAP</span>
+                ) : (<span />)}
+                {recipe.sustainable ? (
+                  <span id="cardTag">Sustainable</span>
+                ) : (<span />)}
+                {recipe.vegan ? (
+                  <span id="cardTag">Vegan</span>
+                ) : (<span />)}
+                {recipe.vegetarian ? (
+                  <span id="cardTag">Vegetarian</span>
+                ) : (<span />)}
+              </div>
+            </div>
+          </div>
+          <hr />
+          <div id="recipeCardBodyAlt">
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
+                payments
+              </div>
+              <p id="cardStatText">${(recipe.pricePerServing / 100).toFixed(2)}</p>
+              <p id="cardStatName"><i>per serving</i></p>
+            </div>
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
+                favorite
+              </div>
+              <p id="cardStatText">{recipe.healthScore}</p>
+              <p id="cardStatName"><i>health score</i></p>
+            </div>
+            <div id="cardStat">
+              <div className="material-symbols-outlined" id="cardStatIcon">
+                schedule
+              </div>
+              <p id="cardStatText">{recipe.readyInMinutes}</p>
+              <p id="cardStatName"><i>minutes</i></p>
+            </div>
+          </div>
+        </div>
       </Link>
     </Col>
   );
@@ -59,6 +127,8 @@ function Saved ()
   const [userData, setUserData] = useState([]);
   const [savedRecipes, setSavedRecipes] = useState([]);
 
+  const [cardLayout, setCardLayout] = useState(false);
+
   useEffect( () =>
   {
     onAuthStateChanged(auth, (currentUser) => {
@@ -68,6 +138,9 @@ function Saved ()
         get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
           if (snapshot.exists()) {
             setUserData(snapshot.val());
+            if (snapshot.val().cardLayout) {
+              setCardLayout(snapshot.val().cardLayout);
+            }
           }
         }).catch((error) => {
           console.error(error);
@@ -105,6 +178,10 @@ function Saved ()
     });
   }
 
+  const switchCardLayout = (event) => {
+    setCardLayout(!cardLayout);
+  };
+
   return (
     <Container>
       {loggedIn ? (
@@ -112,11 +189,18 @@ function Saved ()
           <h1 id="titleText">Saved Recipes</h1>
           <div>
             <Row>
-              {savedRecipes.map( ( recipe ) => (
-                <RecipeCard recipe={recipe} />
-              ) )}
+              {cardLayout ? (
+                savedRecipes.map( ( recipe ) => (
+                  <RecipeCardAlt recipe={recipe} />
+                ) )
+              ) : (
+                savedRecipes.map( ( recipe ) => (
+                  <RecipeCard recipe={recipe} />
+                ) )
+              )}
             </Row>
           </div>
+          <Button variant="secondary" id="switchCardLayoutBtn" onClick={switchCardLayout}>Switch Card Layout</Button>
         </div>
       ) : (
         <div>

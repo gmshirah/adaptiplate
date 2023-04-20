@@ -9,6 +9,11 @@ import Saved from './pages/Saved';
 import Settings from './pages/Settings';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Search from './pages/Search';
+import DietaryRestrictions from './pages/settings/DietaryRestrictions';
+import NutritionalPreferences from './pages/settings/NutritionalPreferences';
+import FinancialPreferences from './pages/settings/FinancialPreferences';
+import AppAppearance from './pages/settings/AppAppearance';
 import reportWebVitals from './reportWebVitals';
 
 // Import the functions you need from the SDKs you need
@@ -20,7 +25,7 @@ import { getAnalytics } from "firebase/analytics";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBlPgsYfKfSl15rkPbRzdX_7pjf3N5i424",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: "adaptipla.firebaseapp.com",
   databaseURL: "https://adaptipla-default-rtdb.firebaseio.com",
   projectId: "adaptipla",
@@ -31,10 +36,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+const app = initializeApp( firebaseConfig );
+const analytics = getAnalytics( app );
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const api = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
+const apiKey = process.env.REACT_APP_API_KEY;
+const apiHost = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
+
+const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
 root.render(
   <>
     <link
@@ -49,6 +58,11 @@ root.render(
         <Route path="/settings" element={<Settings />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/search" element={<Search />} />
+        <Route path="/settings/dietary-restrictions" element={<DietaryRestrictions />} />
+        <Route path="/settings/nutritional-preferences" element={<NutritionalPreferences />} />
+        <Route path="/settings/financial-preferences" element={<FinancialPreferences />} />
+        <Route path="/settings/app-appearance" element={<AppAppearance />} />
         <Route
           path="*"
           element={<Navigate to="/" replace />}
@@ -64,4 +78,4 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-export { app };
+export { app, api, apiKey, apiHost };
