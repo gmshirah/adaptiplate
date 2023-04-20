@@ -121,12 +121,12 @@ function Settings ()
                 navigate_next
               </span>
             </ListGroup.Item>
-            <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/nutritional-preferences`);}}>
+            {/* <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/nutritional-preferences`);}}>
               <span id="settingText">Nutritional Preferences</span>
               <span className="material-symbols-outlined" id="selectIcon">
                 navigate_next
               </span>
-            </ListGroup.Item>
+            </ListGroup.Item> */}
             <ListGroup.Item id="setting" onClick={() => {navigate(`/settings/financial-preferences`);}}>
               <span id="settingText">Financial Preferences</span>
               <span className="material-symbols-outlined" id="selectIcon">
