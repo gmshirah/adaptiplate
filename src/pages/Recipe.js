@@ -289,9 +289,40 @@ function Recipe() {
     }
 
     if (userData.dietaryRestrictions) {
-      for (let id in userData.dietaryRestrictions) {
-        if (!recipeData[userData.dietaryRestrictions[id].id] && userData.dietaryRestrictions[id].value) {
+      for (let index in userData.dietaryRestrictions) {
+        if (!recipeData[userData.dietaryRestrictions[index].id] && userData.dietaryRestrictions[index].value) {
           setShowAlert(true);
+        }
+      }
+    }
+
+    if (userData.financialPreferences) {
+      for (let index in userData.financialPreferences) {
+        switch (userData.financialPreferences[index].id) {
+          case "veryCheap":
+            if ((recipeData.pricePerServing / 100).toFixed(2) >= 0.5 && userData.financialPreferences[index].value) {
+              setShowAlert(true);
+            }
+            break;
+          case "cheap":
+            if ((recipeData.pricePerServing / 100).toFixed(2) >= 1 && userData.financialPreferences[index].value) {
+              setShowAlert(true);
+            }
+            break;
+          case "moderate":
+            if ((recipeData.pricePerServing / 100).toFixed(2) >= 3 && userData.financialPreferences[index].value) {
+              setShowAlert(true);
+            }
+            break;
+          case "expensive":
+            if ((recipeData.pricePerServing / 100).toFixed(2) >= 5 && userData.financialPreferences[index].value) {
+              setShowAlert(true);
+            }
+            break;
+          case "veryExpensive":
+            break;
+          default:
+            break;
         }
       }
     }
