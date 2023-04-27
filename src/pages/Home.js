@@ -81,7 +81,7 @@ const RecipeCardAlt = ( { recipe, path } ) =>
 
   return (
     <Col md={6}>
-      <Link to={`/recipe/${recipe.id}`} id="recipeCardLinkAlt" onClick={handleClick}>
+      <Link to={`/recipe/${ recipe.id }`} id="recipeCardLinkAlt" onClick={handleClick}>
         <div id="recipeCardAlt">
           <div id="recipeCardHeaderAlt">
             <Image thumbnail id="recipeImageAlt" src={recipe.image} />
@@ -90,22 +90,22 @@ const RecipeCardAlt = ( { recipe, path } ) =>
               <div id="cardDietTags">
                 {recipe.dairyFree ? (
                   <span id="cardTag">Dairy Free</span>
-                ) : (<span />)}
+                ) : ( <span /> )}
                 {recipe.glutenFree ? (
                   <span id="cardTag">Gluten Free</span>
-                ) : (<span />)}
+                ) : ( <span /> )}
                 {recipe.lowFodmap ? (
                   <span id="cardTag">Low FODMAP</span>
-                ) : (<span />)}
+                ) : ( <span /> )}
                 {recipe.sustainable ? (
                   <span id="cardTag">Sustainable</span>
-                ) : (<span />)}
+                ) : ( <span /> )}
                 {recipe.vegan ? (
                   <span id="cardTag">Vegan</span>
-                ) : (<span />)}
+                ) : ( <span /> )}
                 {recipe.vegetarian ? (
                   <span id="cardTag">Vegetarian</span>
-                ) : (<span />)}
+                ) : ( <span /> )}
               </div>
             </div>
           </div>
@@ -115,7 +115,7 @@ const RecipeCardAlt = ( { recipe, path } ) =>
               <div className="material-symbols-outlined" id="cardStatIcon">
                 payments
               </div>
-              <p id="cardStatText">${(recipe.pricePerServing / 100).toFixed(2)}</p>
+              <p id="cardStatText">${( recipe.pricePerServing / 100 ).toFixed( 2 )}</p>
               <p id="cardStatName"><i>per serving</i></p>
             </div>
             <div id="cardStat">
@@ -154,7 +154,7 @@ function Home ()
 
   const [ historyLoaded, setHistoryLoaded ] = useState( false );
 
-  const [cardLayout, setCardLayout] = useState(false);
+  const [ cardLayout, setCardLayout ] = useState( false );
 
   const handleNewSearch = async ( event ) =>
   {
@@ -231,6 +231,7 @@ function Home ()
         params: {
           query: input,
           sort: "popularity",
+          number: 30,
         },
         headers: {
           'X-RapidAPI-Key': apiKey,
@@ -240,7 +241,7 @@ function Home ()
         .then( ( response ) =>
         {
           setLoading( false );
-          navigate( '/search', { state: { recipes: response.data } } );
+          navigate( '/search', { state: { recipes: response.data, currentSearch: input } } );
         } )
         .catch( ( error ) =>
         {
@@ -264,14 +265,17 @@ function Home ()
       if ( currentUser )
       {
         const dbRef = ref( getDatabase() );
-        
-        get(child(dbRef, `users/${currentUser.uid}`)).then((snapshot) => {
-          if (snapshot.exists() && snapshot.val().cardLayout) {
-            setCardLayout(snapshot.val().cardLayout);
+
+        get( child( dbRef, `users/${ currentUser.uid }` ) ).then( ( snapshot ) =>
+        {
+          if ( snapshot.exists() && snapshot.val().cardLayout )
+          {
+            setCardLayout( snapshot.val().cardLayout );
           }
-        }).catch((error) => {
-          console.error(error);
-        });
+        } ).catch( ( error ) =>
+        {
+          console.error( error );
+        } );
 
         const recentRecipesRef = child( dbRef, `users/${ currentUser.uid }/recentlyViewed` );
         get( recentRecipesRef ).then( ( snapshot ) =>
@@ -298,8 +302,9 @@ function Home ()
     } );
   }, [] );
 
-  const switchCardLayout = (event) => {
-    setCardLayout(!cardLayout);
+  const switchCardLayout = ( event ) =>
+  {
+    setCardLayout( !cardLayout );
   };
 
   return (
