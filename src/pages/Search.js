@@ -50,8 +50,9 @@ const RecipeCard = ( { recipe } ) =>
         includeNutrition: true,
       },
       headers: {
-        'X-RapidAPI-Key': apiKey,
-        'X-RapidAPI-Host': apiHost
+        'x-api-key': apiKey,
+        //'X-RapidAPI-Key': apiKey,
+        //'X-RapidAPI-Host': apiHost
       }
     } )
       .then( ( response ) =>
@@ -137,7 +138,7 @@ function Search ()
     setFilter( filter );
   };
 
-  const handleNewSearch = async ( filter ) =>
+  const handleNewSearch = async ( optionalFilter = filter ) =>
   {
     event.preventDefault();
     setLoading( true );
@@ -153,8 +154,9 @@ function Search ()
           includeNutrition: true,
         },
         headers: {
-          'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': apiHost
+          'x-api-key': apiKey,
+          //'X-RapidAPI-Key': apiKey,
+          //'X-RapidAPI-Host': apiHost
         }
       } )
         .then( ( response ) =>
@@ -213,17 +215,18 @@ function Search ()
           query: input,
           sort: "popularity",
           number: 30,
-          diet: filter,
+          diet: optionalFilter,
         },
         headers: {
-          'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': apiHost
+          'x-api-key': apiKey,
+          //'X-RapidAPI-Key': apiKey,
+          //'X-RapidAPI-Host': apiHost
         }
       } )
         .then( ( response ) =>
         {
           setLoading( false );
-          navigate( '/search', { state: { recipes: response.data, currentSearch: input } } );
+          navigate( '/Search', { state: { recipes: response.data, currentSearch: input } } );
         } )
         .catch( ( error ) =>
         {
