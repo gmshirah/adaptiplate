@@ -36,14 +36,14 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp( firebaseConfig );
-const analytics = getAnalytics( app );
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
-const api = "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
+const api = "https://api.spoonacular.com";
 const apiKey = process.env.REACT_APP_API_KEY;
 const apiHost = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
 
-const root = ReactDOM.createRoot( document.getElementById( 'root' ) );
+const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <>
     <link

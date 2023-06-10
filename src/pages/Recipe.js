@@ -20,13 +20,13 @@ import {
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
-getDatabase,
-ref,
-get,
-set,
-child,
-remove,
-push
+  getDatabase,
+  ref,
+  get,
+  set,
+  child,
+  remove,
+  push
 } from "firebase/database";
 
 function parseSubResponse(response) {
@@ -52,8 +52,9 @@ const Ingredient = ({ ingredient, onInfoClick }) => {
       setSubs(Array());
       axios.get(`${api}/food/ingredients/${ingredient.id}/substitutes`, {
         headers: {
-          'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': apiHost
+          'x-api-key': apiKey,
+          //'X-RapidAPI-Key': apiKey,
+          //'X-RapidAPI-Host': apiHost
         }
       })
         .then((response) => {
@@ -70,94 +71,95 @@ const Ingredient = ({ ingredient, onInfoClick }) => {
                   'targetUnit': parsedSub[1],
                 },
                 headers: {
-                  'X-RapidAPI-Key': apiKey,
-                  'X-RapidAPI-Host': apiHost
+                  'x-api-key': apiKey,
+                  //'X-RapidAPI-Key': apiKey,
+                  //'X-RapidAPI-Host': apiHost
                 }
               })
-              .then((response) => {
-                let targetAmount = response.data.targetAmount;
+                .then((response) => {
+                  let targetAmount = response.data.targetAmount;
 
-                // arr[i] format example: 1 cup = 7/8 cup [ingredient] + 1 tsp [ingredient]
+                  // arr[i] format example: 1 cup = 7/8 cup [ingredient] + 1 tsp [ingredient]
 
-                // response.data.targetAmount example:
-                //   sourceAmount: 8
-                //   sourceUnit: Tbsp
-                //   targetUnit: cup
-                //   targetAmount: 0.5
-                // we will use this to determine measurements for ingredient substitutes
+                  // response.data.targetAmount example:
+                  //   sourceAmount: 8
+                  //   sourceUnit: Tbsp
+                  //   targetUnit: cup
+                  //   targetAmount: 0.5
+                  // we will use this to determine measurements for ingredient substitutes
 
-                // subsStr format example: 7/8 cup [ingredient] + 1 tsp [ingredient]
-                let subsStr = arr[i].split("=")[1].trim();
-                
-                // regex to split subsStr at "+" and "and" (API responses are inconsistent)
-                const re = /(?: and | \+ )([1-9])/g;
+                  // subsStr format example: 7/8 cup [ingredient] + 1 tsp [ingredient]
+                  let subsStr = arr[i].split("=")[1].trim();
 
-                // subsStr format example: ["7/8 cup [ingredient]", "1 tsp [ingredient]"]
-                subsStr = subsStr.split(re);
+                  // regex to split subsStr at "+" and "and" (API responses are inconsistent)
+                  const re = /(?: and | \+ )([1-9])/g;
 
-                // subsArr will represent array of substitute ingredients from one string
-                let subsArr = [];
+                  // subsStr format example: ["7/8 cup [ingredient]", "1 tsp [ingredient]"]
+                  subsStr = subsStr.split(re);
 
-                for (let j = 0; j < subsStr.length; j += 2) {
-                  if (j >= 2) {
-                    subsStr[j] = subsStr[j-1] + subsStr[j];
-                  }
+                  // subsArr will represent array of substitute ingredients from one string
+                  let subsArr = [];
 
-                  if (ingredient.measures.us.unitShort == "") {
-                    // parse first word in each string as a numeric value and multiply it by
-                    // ingredient.amount
-                    let str = eval(subsStr[j].trim().split(" ")[0]) * ingredient.amount;
+                  for (let j = 0; j < subsStr.length; j += 2) {
+                    if (j >= 2) {
+                      subsStr[j] = subsStr[j - 1] + subsStr[j];
+                    }
 
-                    // round value to nearest hundredth if it's not a whole number
-                    str % 1 == 0 ? str = str : str = str.toFixed(2);
+                    if (ingredient.measures.us.unitShort == "") {
+                      // parse first word in each string as a numeric value and multiply it by
+                      // ingredient.amount
+                      let str = eval(subsStr[j].trim().split(" ")[0]) * ingredient.amount;
 
-                    // concatenate the rest of the string to the newly converted value
-                    str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length +
+                      // round value to nearest hundredth if it's not a whole number
+                      str % 1 == 0 ? str = str : str = str.toFixed(2);
+
+                      // concatenate the rest of the string to the newly converted value
+                      str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length +
                         subsStr[j].trim().split(" ")[1].length + 1);
 
-                    // push this string into subsArr
-                    subsArr.push(str.trim());
-                  } else if (!targetAmount) {
-                    // parse first word in each string as a numeric value and multiply it by
-                    // ingredient.amount
-                    let str = eval(subsStr[j].trim().split(" ")[0]) * ingredient.amount;
+                      // push this string into subsArr
+                      subsArr.push(str.trim());
+                    } else if (!targetAmount) {
+                      // parse first word in each string as a numeric value and multiply it by
+                      // ingredient.amount
+                      let str = eval(subsStr[j].trim().split(" ")[0]) * ingredient.amount;
 
-                    // round value to nearest hundredth if it's not a whole number
-                    str % 1 == 0 ? str = str : str = str.toFixed(2);
+                      // round value to nearest hundredth if it's not a whole number
+                      str % 1 == 0 ? str = str : str = str.toFixed(2);
 
-                    // concatenate original ingredient unit as best guess
-                    str += " " + ingredient.measures.us.unitShort;
+                      // concatenate original ingredient unit as best guess
+                      str += " " + ingredient.measures.us.unitShort;
 
-                    // concatenate the rest of the string to the newly converted value
-                    str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length +
+                      // concatenate the rest of the string to the newly converted value
+                      str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length +
                         subsStr[j].trim().split(" ")[1].length + 1);
 
-                    // push this string into subsArr
-                    subsArr.push(str.trim());
-                  } else {
-                    // parse first word in each string as a numeric value and multiply it by
-                    // response.data.targetAmount
-                    let str = eval(subsStr[j].trim().split(" ")[0]) * targetAmount;
+                      // push this string into subsArr
+                      subsArr.push(str.trim());
+                    } else {
+                      // parse first word in each string as a numeric value and multiply it by
+                      // response.data.targetAmount
+                      let str = eval(subsStr[j].trim().split(" ")[0]) * targetAmount;
 
-                    // round value to nearest hundredth if it's not a whole number
-                    str % 1 == 0 ? str = str : str = str.toFixed(2);
+                      // round value to nearest hundredth if it's not a whole number
+                      str % 1 == 0 ? str = str : str = str.toFixed(2);
 
-                    // concatenate the rest of the string to the newly converted value
-                    str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length);
+                      // concatenate the rest of the string to the newly converted value
+                      str += subsStr[j].substring(subsStr[j].trim().split(" ")[0].length);
 
-                    // push this string into subsArr
-                    subsArr.push(str.trim());
+                      // push this string into subsArr
+                      subsArr.push(str.trim());
+                    }
                   }
-                }
 
-                // subsArr format example: ["0.44 cup [ingredient]", "0.5 tsp [ingredient]"]
-                setSubs(oldArray => [...oldArray, subsArr]);
-              })
-              .catch((error) => {
-                setLoading(false);
-                alert("Error converting substitutions. Please try again!");
-                console.error(error);
-              });
+                  // subsArr format example: ["0.44 cup [ingredient]", "0.5 tsp [ingredient]"]
+                  setSubs(oldArray => [...oldArray, subsArr]);
+                })
+                .catch((error) => {
+                  setLoading(false);
+                  alert("Error converting substitutions. Please try again!");
+                  console.error(error);
+                });
             }
           } else {
             setSubs([]);
@@ -198,7 +200,7 @@ const Ingredient = ({ ingredient, onInfoClick }) => {
                       <span />
                     )}
                   </div>
-                  <span className="material-symbols-outlined" id="infoIcon" onClick={() => {onInfoClick(sub, ingredient);}}>
+                  <span className="material-symbols-outlined" id="infoIcon" onClick={() => { onInfoClick(sub, ingredient); }}>
                     info
                   </span>
                 </Container>
@@ -403,73 +405,75 @@ function Recipe() {
         'language': "en",
       },
       headers: {
-        'X-RapidAPI-Key': apiKey,
-        'X-RapidAPI-Host': apiHost
+        'x-api-key': apiKey,
+        //'X-RapidAPI-Key': apiKey,
+        //'X-RapidAPI-Host': apiHost
       }
     })
-    .then((response) => {
-      setNutritionInfo(response.data);
-
-      let arr = response.data[0].nutrition.nutrients.slice();
-      for (let i = 1; i < response.data.length; i++) {
-        for (let j = 0; j < arr.length; j++) {
-          const isMatch = (element) => element.name == arr[j].name;
-
-          if (response.data[i].nutrition.nutrients.findIndex(isMatch) == -1) {
-            arr.splice(j, 1);
-            j--;
-          } else {
-            arr[j].amount += response.data[i].nutrition.nutrients.find(isMatch).amount;
-            arr[j].percentOfDailyNeeds += response.data[i].nutrition.nutrients.find(isMatch).percentOfDailyNeeds;
-            if (arr[j].amount % 1 != 0) arr[j].amount = arr[j].amount.toFixed(2);
-            if (arr[j].percentOfDailyNeeds % 1 != 0) arr[j].percentOfDailyNeeds = arr[j].percentOfDailyNeeds.toFixed(2);
-          }
-        }
-      }
-
-      encodedParams = new URLSearchParams();
-      encodedParams.append("ingredientList", `${originalIngredient.amount} ${originalIngredient.measures.us.unitShort} ${originalIngredient.name}`);
-      encodedParams.append("servings", "1");
-
-      axios.post(`${api}/recipes/parseIngredients`, encodedParams, {
-        params: {
-          'includeNutrition': true,
-          'language': "en",
-        },
-        headers: {
-          'X-RapidAPI-Key': apiKey,
-          'X-RapidAPI-Host': apiHost
-        }
-      })
       .then((response) => {
-        if (response.data[0].nutrition) {
-          for (let i = 0; i < arr.length; i++) {
-            const isMatch = (element) => element.name == arr[i].name;
-  
-            if (response.data[0].nutrition.nutrients.findIndex(isMatch) == -1) {
-              arr.splice(i, 1);
-              i--;
+        setNutritionInfo(response.data);
+
+        let arr = response.data[0].nutrition.nutrients.slice();
+        for (let i = 1; i < response.data.length; i++) {
+          for (let j = 0; j < arr.length; j++) {
+            const isMatch = (element) => element.name == arr[j].name;
+
+            if (response.data[i].nutrition.nutrients.findIndex(isMatch) == -1) {
+              arr.splice(j, 1);
+              j--;
             } else {
-              arr[i].compareAmount = response.data[0].nutrition.nutrients.find(isMatch).amount;
-              arr[i].comparePercentOfDailyNeeds = response.data[0].nutrition.nutrients.find(isMatch).percentOfDailyNeeds;
-              if (arr[i].compareAmount % 1 != 0) arr[i].compareAmount = arr[i].compareAmount.toFixed(2);
-              if (arr[i].comparePercentOfDailyNeeds % 1 != 0) arr[i].comparePercentOfDailyNeeds = arr[i].comparePercentOfDailyNeeds.toFixed(2);
+              arr[j].amount += response.data[i].nutrition.nutrients.find(isMatch).amount;
+              arr[j].percentOfDailyNeeds += response.data[i].nutrition.nutrients.find(isMatch).percentOfDailyNeeds;
+              if (arr[j].amount % 1 != 0) arr[j].amount = arr[j].amount.toFixed(2);
+              if (arr[j].percentOfDailyNeeds % 1 != 0) arr[j].percentOfDailyNeeds = arr[j].percentOfDailyNeeds.toFixed(2);
             }
           }
-
-          setCompareNutritionInfo(arr);
         }
-        setNutritionLoading(false);
+
+        encodedParams = new URLSearchParams();
+        encodedParams.append("ingredientList", `${originalIngredient.amount} ${originalIngredient.measures.us.unitShort} ${originalIngredient.name}`);
+        encodedParams.append("servings", "1");
+
+        axios.post(`${api}/recipes/parseIngredients`, encodedParams, {
+          params: {
+            'includeNutrition': true,
+            'language': "en",
+          },
+          headers: {
+            'x-api-key': apiKey,
+            //'X-RapidAPI-Key': apiKey,
+            //'X-RapidAPI-Host': apiHost
+          }
+        })
+          .then((response) => {
+            if (response.data[0].nutrition) {
+              for (let i = 0; i < arr.length; i++) {
+                const isMatch = (element) => element.name == arr[i].name;
+
+                if (response.data[0].nutrition.nutrients.findIndex(isMatch) == -1) {
+                  arr.splice(i, 1);
+                  i--;
+                } else {
+                  arr[i].compareAmount = response.data[0].nutrition.nutrients.find(isMatch).amount;
+                  arr[i].comparePercentOfDailyNeeds = response.data[0].nutrition.nutrients.find(isMatch).percentOfDailyNeeds;
+                  if (arr[i].compareAmount % 1 != 0) arr[i].compareAmount = arr[i].compareAmount.toFixed(2);
+                  if (arr[i].comparePercentOfDailyNeeds % 1 != 0) arr[i].comparePercentOfDailyNeeds = arr[i].comparePercentOfDailyNeeds.toFixed(2);
+                }
+              }
+
+              setCompareNutritionInfo(arr);
+            }
+            setNutritionLoading(false);
+          })
+          .catch((error) => {
+            alert("Error retrieving nutritional information. Please try again!");
+            console.error(error);
+          });
       })
       .catch((error) => {
         alert("Error retrieving nutritional information. Please try again!");
         console.error(error);
       });
-    })
-    .catch((error) => {
-      alert("Error retrieving nutritional information. Please try again!");
-      console.error(error);
-    });
   };
 
   const onNutritionClose = () => {
